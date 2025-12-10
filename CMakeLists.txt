@@ -11,4 +11,5 @@ add_executable(Pufferfish)
 target_sources(Pufferfish 
     PRIVATE 
         main.c
+        board.c
 )
