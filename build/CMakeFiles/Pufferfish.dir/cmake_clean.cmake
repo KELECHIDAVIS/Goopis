@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/Pufferfish.dir/board.c.o"
+  "CMakeFiles/Pufferfish.dir/board.c.o.d"
   "CMakeFiles/Pufferfish.dir/main.c.o"
   "CMakeFiles/Pufferfish.dir/main.c.o.d"
   "Pufferfish"

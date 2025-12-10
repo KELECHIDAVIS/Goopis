@@ -1,5 +1,5 @@
-CMakeFiles/Pufferfish.dir/main.c.o: \
- /mnt/c/ProgrammingProjects/Pufferfish-V2/main.c \
+CMakeFiles/Pufferfish.dir/board.c.o: \
+ /mnt/c/ProgrammingProjects/Pufferfish-V2/board.c \
  /usr/include/stdc-predef.h \
  /mnt/c/ProgrammingProjects/Pufferfish-V2/board.h /usr/include/ctype.h \
  /usr/include/features.h /usr/include/features-time64.h \
