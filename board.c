@@ -89,41 +89,31 @@ void printChessBoard(Board *board ){
     printf("   _ _ _ _ _ _ _ _ \n");
     printf("   a b c d e f g h \n");
 }
-void initBoard(Board *board, char *fen)
-{
+void readPiecesFromFen(Board* board, char *fen ){
     // initialize all bbs to 0 
     for (int i = 0; i < 8; ++i){
         board -> pieces[i] =0;
     }
 
-    // starting from the top right, if the char is a number, skip that many squares
-    //  if its a /, move to next rank
-    //  if its a letter, place the corresponding piece on that square
-    // uppercase white lowercase black
-    char *curr = fen;
     int rank = 7;
     int file = 0;
-    while (*curr != ' ')
+
+    while (*fen != ' ')
     {
-        char c = *curr;
+        char c = *fen;
 
-
-        if (c == '/')
-        {
+        if (c == '/'){
             rank--;
             file = 0;
         }
-        else if (isalpha(c))
-        {
-            if (!(file < 8 && file >= 0 && rank >= 0 && rank < 8))
-            {
+        else if (isalpha(c)){
+            if (!(file < 8 && file >= 0 && rank >= 0 && rank < 8)){
                 printf("Error with out of bounds in FEN parsing should be between [0-7]: file %d rank %d\n", file, rank);
                 abort();
             }
             enumPiece pieceType;
             enumPiece color;
-            switch (tolower(c))
-            {
+            switch (tolower(c)){
             case 'p':
                 pieceType = nPawn;
                 break;
@@ -146,12 +136,9 @@ void initBoard(Board *board, char *fen)
                 printf("Error parsing FEN: invalid piece char %c\n", c);
                 abort();
             }
-            if (isupper(c))
-            {
+            if (isupper(c)){
                 color = nWhite;
-            }
-            else
-            {
+            }else{
                 color = nBlack;
             }
             enumSquare square = (rank * 8 + file);
@@ -160,13 +147,115 @@ void initBoard(Board *board, char *fen)
 
             file++;
         }
-        else if (isdigit(c))
-        {
+        else if (isdigit(c)){
             int emptySquares = c - '0';
             file += emptySquares;
         }
 
-        curr++;
+        fen++;
     }
+    fen++; // going onto next word 
+}
+
+void readSideToMoveFromFen(Board* board, char* fen ) {
+    board->whiteToMove = tolower(*fen) == 'w'; 
+    fen ++; 
+}
+void readFromCastlingRights(Board* board, char* fen ) {
+    board->castlingRights = 0; // make sure it's initialized
+    
+    if (*fen == '-' ){
+        fen+=2 ; 
+        return; 
+    }
+
+
+    while(*fen!=' '){
+        char c = *fen ; 
+        switch(c){
+            case 'K':
+                board->castlingRights |= W_K_CASTLE; 
+                break; 
+            case 'Q':
+                board->castlingRights |= W_Q_CASTLE; 
+                break; 
+            case 'k':
+                board->castlingRights |= B_K_CASTLE; 
+                break; 
+            case 'q':
+                board->castlingRights |= B_Q_CASTLE; 
+                break; 
+            default:
+                printf("Error parsing castling rights: %c\n", c);
+                abort();
+        }
+        fen++; 
+    }
+
+    fen++; 
+}
+void readEnPassantFromFen(Board* board, char* fen ) {
+    if (*fen == '-' ){
+        fen+=2 ; 
+        return; 
+    }
+
+    // first char should be a letter 
+    char rank = *fen ; 
+    if (!isalpha(rank)) {
+        puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)" );
+        abort();
+    }
+    
+    int rankVal = tolower(rank) - 'a';
+
+    fen++; 
+    char file = *fen ; 
+    if (!isdigit(file)) {
+        puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)" );
+        abort();
+    }
+    
+    int fileVal = tolower(file) - '0' -1 ; // bring the range to 0-7
+
+    board -> enPassantSquare = (enumSquare) (rankVal*8 +fileVal); 
+
+    fen+=2; 
+
+}
+void readHalfMoveClockFromFen(Board* board, char* fen ) {
+     
+}
+void readFullMoveClockFromFen(Board* board, char* fen ) {
+    
+}
+void initBoard(Board *board, char *fen)
+{
+
+    // now at side to move 
+    readPiecesFromFen(board , fen); 
+    
+    // if empty the format is weird 
+    assert(fen!=NULL && "fen is empty after reading pieces"); 
+
+    readSideToMoveFromFen(board, fen); 
+    
+    assert(fen!=NULL && "fen is empty after reading side"); 
+    
+    readCastlingRightsFromFen(board, fen); 
+    
+    assert(fen!=NULL && "fen is empty after reading castling"); 
+    
+    readEnPassantFromFen(board, fen); 
+
+    assert(fen!=NULL && "fen is empty after reading en passant"); 
+
+    readHalfMoveClockFromFen(board, fen);
+
+    assert(fen!=NULL && "fen is empty after reading half move clock"); 
+
+    readFullMoveClockFromFen(board, fen); 
+
+
     
 }

@@ -1,10 +1,19 @@
 #ifndef BOARD_H 
 #define BOARD_H
+
 #include <ctype.h>
 #include <stdlib.h> 
 #include <stdio.h> 
 #include <stdbool.h>
 #include <assert.h> 
+#include <string.h> 
+
+//castling rights
+#define W_K_CASTLE 0b1000 
+#define W_Q_CASTLE 0b0100 
+#define B_K_CASTLE 0b0010 
+#define B_Q_CASTLE 0b0001 
+
 typedef unsigned long long U64;
 
 typedef enum {
