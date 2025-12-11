@@ -101,7 +101,7 @@ void printBoardDetails(Board *board)
     printf("Half Move Clock: %d\n" , board->halfmoveClock); 
     printf("Full Move Counter: %d\n" , board->fullmoveNumber); 
 }
-void readPiecesFromFen(Board *board, char *fen)
+char* readPiecesFromFen(Board *board, char *fen)
 {
     // initialize all bbs to 0 
     for (int i = 0; i < 8; ++i){
@@ -168,18 +168,20 @@ void readPiecesFromFen(Board *board, char *fen)
         fen++;
     }
     fen++; // going onto next word
+    return fen ; 
 }
 
-void readSideToMoveFromFen(Board* board, char* fen ) {
+char *  readSideToMoveFromFen(Board* board, char* fen ) {
     board->whiteToMove = tolower(*fen) == 'w'; 
-    fen ++; 
+    fen +=2; 
+    return fen; 
 }
-void readFromCastlingRights(Board* board, char* fen ) {
+char * readFromCastlingRights(Board* board, char* fen ) {
     board->castlingRights = 0; // make sure it's initialized
     
     if (*fen == '-' ){
         fen+=2 ; 
-        return; 
+        return fen; 
     }
 
 
@@ -206,37 +208,40 @@ void readFromCastlingRights(Board* board, char* fen ) {
     }
 
     fen++; 
+
+    return fen; 
 }
-void readEnPassantFromFen(Board* board, char* fen ) {
+char *  readEnPassantFromFen(Board* board, char* fen ) {
     if (*fen == '-' ){
         fen+=2 ; 
-        return; 
+        return fen; 
     }
 
     // first char should be a letter 
-    char rank = *fen ; 
-    if (!isalpha(rank)) {
+    char file = *fen ; 
+    if (!isalpha(file)) {
         puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)" );
         abort();
     }
     
-    int rankVal = tolower(rank) - 'a';
+    int fileVal = tolower(file) - 'a';
 
     fen++; 
-    char file = *fen ; 
-    if (!isdigit(file)) {
+    char rank = *fen ; 
+    if (!isdigit(rank)) {
         puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)" );
         abort();
     }
     
-    int fileVal = tolower(file) - '0' -1 ; // bring the range to 0-7
+    int rankVal = rank - '0' -1 ; // bring the range to 0-7
 
     board -> enPassantSquare = (enumSquare) (rankVal*8 +fileVal); 
 
     fen+=2; 
+    return fen ; 
 
 }
-void readHalfMoveClockFromFen(Board* board, char* fen ) {
+char * readHalfMoveClockFromFen(Board* board, char* fen ) {
      char c = *fen ; 
 
      if (!isdigit(c)){
@@ -251,6 +256,8 @@ void readHalfMoveClockFromFen(Board* board, char* fen ) {
         fen ++; 
      }
      fen ++; 
+
+     return fen ; 
 }
 void readFullMoveClockFromFen(Board* board, char* fen ) {
     char c = *fen ; 
@@ -261,34 +268,37 @@ void readFullMoveClockFromFen(Board* board, char* fen ) {
      }
 
      board -> fullmoveNumber = atoi(fen) ; // get first number string  
+     
      // dnt increment to avoid undefined behavior
 }
 void initBoard(Board *board, char *fen)
 {
 
+    char *curr = fen ; // copy fen 
+
     // now at side to move 
-    readPiecesFromFen(board , fen); 
+    curr = readPiecesFromFen(board , curr); 
     
     // if empty the format is weird 
-    assert(fen!=NULL && "fen is empty after reading pieces"); 
+    assert(curr!=NULL && "fen is empty after reading pieces"); 
 
-    readSideToMoveFromFen(board, fen); 
+    curr = readSideToMoveFromFen(board, curr); 
     
-    assert(fen!=NULL && "fen is empty after reading side"); 
+    assert(curr!=NULL && "fen is empty after reading side"); 
     
-    readFromCastlingRights(board, fen); 
+    curr = readFromCastlingRights(board, curr); 
     
-    assert(fen!=NULL && "fen is empty after reading castling"); 
+    assert(curr!=NULL && "fen is empty after reading castling"); 
     
-    readEnPassantFromFen(board, fen); 
+    curr = readEnPassantFromFen(board, curr); 
 
-    assert(fen!=NULL && "fen is empty after reading en passant"); 
+    assert(curr!=NULL && "fen is empty after reading en passant"); 
 
-    readHalfMoveClockFromFen(board, fen);
+    curr = readHalfMoveClockFromFen(board, curr);
 
-    assert(fen!=NULL && "fen is empty after reading half move clock"); 
+    assert(curr!=NULL && "fen is empty after reading half move clock"); 
 
-    readFullMoveClockFromFen(board, fen); 
+    readFullMoveClockFromFen(board, curr); 
 
 
     

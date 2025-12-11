@@ -22,6 +22,6 @@ int main(){
     puts("Board 2 details: "); 
     printBoardDetails(&board2); 
     puts("Board 3 details: "); 
-    printBoardDetails(&board2); 
+    printBoardDetails(&board3); 
     return 0;
 }
