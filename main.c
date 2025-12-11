@@ -8,9 +8,10 @@ int main()
     // puts("\nAll Pieces:");
     // printBB(getAllPieces(&board));
 
+    // coming out of the initialization , the white board is set to zero 
     puts("\nWhite Pieces:");
     U64 whitePieces = getColorPieces(&board, nWhite);
-    //assert ((board.pieces[nWhite] & 0x000000000000FFFF) != 0);
+    assert ((board.pieces[nWhite] & 0x000000000000FFFF) != 0);
     printBB(whitePieces);
 
     // puts("\nBlack Pieces:");

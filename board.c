@@ -125,5 +125,5 @@ void initBoard(Board *board, char *fen)
 
         curr++;
     }
-    board->pieces[nWhite] = 0ULL;
+    
 }
