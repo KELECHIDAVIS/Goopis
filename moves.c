@@ -30,6 +30,14 @@ void precomputeKnightAttacks()
     }
 }
 
+void printKnightAttacks()
+{
+    for( int square = 0 ; square < 64 ; square++){
+        printf("Knight attacks from square %d:\n", square);
+        printBB(KNIGHT_ATTACK_LOOKUP[square]);
+    }
+}
+
 U64 getKnightAttacks(enumSquare square)
 {
     square++; 
