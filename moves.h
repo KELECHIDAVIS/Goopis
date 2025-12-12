@@ -3,11 +3,10 @@
 
 #include "board.h"
 
-U64 arrKnightAttacks[64];
+extern U64 KNIGHT_ATTACK_LOOKUP[64]; // precomputed knight attacks for each square
 
 extern void precomputeKnightAttacks();
-extern 
-U64 getKnightAttacks (enumSquare square); // returns knight pattern from square 
+extern U64 getKnightAttacks (enumSquare square); // returns knight pattern from square 
 
 
 #endif //MOVES_H
