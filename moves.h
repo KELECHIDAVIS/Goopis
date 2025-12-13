@@ -11,7 +11,7 @@
 extern U64 KNIGHT_ATTACK_LOOKUP[64]; // precomputed knight attacks for each square
 extern void precomputeKnightAttacks();
 extern void printKnightAttacks();
-extern U64 getKnightAttacks (enumSquare square); // returns knight pattern from square
+extern U64 getKnightAttackPattern(enumSquare square); // returns knight pattern from square
 
 // Moves are encoded into 16 bit integers as follows:
 // bits 0-5: destination square (0-63)
@@ -35,10 +35,11 @@ typedef enum
     QUEEN_PROMO_CAPTURE_FLAG = 15
 } MoveFlag;
 
-typedef uint16_t Move ; // 16 bit move representation
+typedef uint16_t Move; // 16 bit move representation
 
-static inline Move encodeMove(enumSquare from, enumSquare to, MoveFlag flag) {
-    return ( (flag & 0xF) << 12 ) | ( (from & 0x3F) << 6 ) | (to & 0x3F);
+static inline Move encodeMove(enumSquare from, enumSquare to, MoveFlag flag)
+{
+    return ((flag & 0xF) << 12) | ((from & 0x3F) << 6) | (to & 0x3F);
 }
 
 static inline unsigned int getTo(Move move) { return move & 0x3f; }
@@ -58,13 +59,13 @@ static inline void setFrom(Move *move, unsigned int from)
 }
 static inline bool isCapture(Move move) { return (move & CAPTURE_FLAG) != 0; }
 
-
-//Pass in a move list array and it'll be filled with legal moves
-extern void getLegalMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getPawnMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getKnightMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getBishopMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getRookMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getQueenMoves(Board *board, Move* moveList , size_t *numMoves);
-extern void getKingMoves(Board *board, Move* moveList , size_t *numMoves);
-#endif //MOVES_H
+// Pass in a move list array and it'll be filled with legal moves
+extern void getLegalMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getPawnMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getKnightMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getBishopMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getRookMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getQueenMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void getKingMoves(Board *board, Move *moveList, size_t *numMoves);
+extern void translateFlagToAlgebraic(MoveFlag flag, char *buffer);
+#endif // MOVES_H

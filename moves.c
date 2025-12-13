@@ -64,21 +64,21 @@ U64 KNIGHT_ATTACK_LOOKUP[] = {
     0x0044280000000000ULL,
     0x0088500000000000ULL,
     0x0010a00000000000ULL,
-    0x0020400000000000ULL
-};
+    0x0020400000000000ULL};
 
 U64 noNoEa(U64 b) { return (b << 17) & ~FILE_A; }
-U64 noEaEa(U64 b) { return (b << 10) & ~(FILE_A |FILE_B) ; }
+U64 noEaEa(U64 b) { return (b << 10) & ~(FILE_A | FILE_B); }
 U64 soEaEa(U64 b) { return (b >> 6) & ~(FILE_A | FILE_B); }
 U64 soSoEa(U64 b) { return (b >> 15) & ~FILE_A; }
-U64 noNoWe(U64 b) { return (b << 15) &  ~FILE_H; }
+U64 noNoWe(U64 b) { return (b << 15) & ~FILE_H; }
 U64 noWeWe(U64 b) { return (b << 6) & ~(FILE_G | FILE_H); }
 U64 soWeWe(U64 b) { return (b >> 10) & ~(FILE_G | FILE_H); }
 U64 soSoWe(U64 b) { return (b >> 17) & ~FILE_H; }
 
 void precomputeKnightAttacks()
 {
-    for( int square = 0 ; square <64 ; square++){
+    for (int square = 0; square < 64; square++)
+    {
         // add all possible knight moves from this square
         U64 attacks = 0ULL;
         U64 position = 1ULL << square;
@@ -90,54 +90,121 @@ void precomputeKnightAttacks()
         attacks |= noWeWe(position); // up-right
         attacks |= soWeWe(position); // down-right
         attacks |= soSoWe(position); // down-left
-        
+
         KNIGHT_ATTACK_LOOKUP[square] = attacks;
     }
 }
 
 void printKnightAttacks()
 {
-    for( int square = 0 ; square < 64 ; square++){
+    for (int square = 0; square < 64; square++)
+    {
         printf("Knight attacks from square %d:\n", square);
         printBB(KNIGHT_ATTACK_LOOKUP[square]);
     }
 }
 
-U64 getKnightAttacks(enumSquare square)
+U64 getKnightAttackPattern(enumSquare square)
 {
-    square++; 
-    return 0ULL; 
+    return KNIGHT_ATTACK_LOOKUP[square];
 }
 
+void extractMovesFromBB(Move* moveList, size_t *numMoves, U64 possibleMoves, enumSquare fromSquare, MoveFlag flag)
+{
+    while (possibleMoves)
+    {
+        U64 toBit = LSBIT(possibleMoves);
+        possibleMoves = CLEARLSBIT(possibleMoves);
+        enumSquare toSquare = __builtin_ctzll(toBit);
+
+        Move move = encodeMove(fromSquare, toSquare, flag);
+        moveList[(*numMoves)++] = move;
+    }
+}
 void getKnightMoves(Board *board, Move *moveList, size_t *numMoves)
 {
     enumPiece side = board->whiteToMove ? nWhite : nBlack;
-    U64 knights = getSpecificColorPieces(board, side , nKnight); 
-   
-    //TODO: remove temp code for errors :
-    moveList[0] = 0; 
-    *numMoves = 0;
-    //END TODO
+    U64 knights = getSpecificColorPieces(board, side, nKnight);
 
-    while( knights ){
+    while (knights)
+    {
         U64 pos = LSBIT(knights);
         knights = CLEARLSBIT(knights);
         enumSquare fromSquare = __builtin_ctzll(pos);
 
-        U64 attacks = getKnightAttacks(fromSquare);
-        //TODO: remove temp code for errors :
-        (void)attacks;
-        //END TODO
+        U64 attackPattern = getKnightAttackPattern(fromSquare);
+
+        // and with empty to get quiet moves 
+        U64 empty = ~getAllPieces(board);
+        extractMovesFromBB(moveList, numMoves, attackPattern & empty, fromSquare, QUIET_MOVE_FLAG);
+
+
+        // and with opponent pieces to get captures
+        enumPiece opponentSide = side == nWhite ? nBlack : nWhite;
+        U64 opponentPieces = getColorPieces(board, opponentSide);
+        extractMovesFromBB(moveList, numMoves, attackPattern & opponentPieces, fromSquare, CAPTURE_FLAG);
+
     }
+}
+void translateFlagToAlgebraic(MoveFlag flag, char *buffer)
+{
+    switch (flag)
+    {
+    case QUIET_MOVE_FLAG:
+        buffer[0] = 'Q';
+        break;
+    case DOUBLE_PAWN_PUSH_FLAG:
+        buffer[0] = 'D';
+        break;
+    case KING_CASTLE_FLAG:
+        buffer[0] = 'K';
+        break;
+    case QUEEN_CASTLE_FLAG:
+        buffer[0] = 'Q';
+        break;
+    case CAPTURE_FLAG:
+        buffer[0] = 'C';
+        break;
+    case EN_PASSANT_CAPTURE_FLAG:
+        buffer[0] = 'E';
+        break;
+    case KNIGHT_PROMOTION_FLAG:
+        buffer[0] = 'N';
+        break;
+    case BISHOP_PROMOTION_FLAG:
+        buffer[0] = 'B';
+        break;
+    case ROOK_PROMOTION_FLAG:
+        buffer[0] = 'R';
+        break;
+    case QUEEN_PROMOTION_FLAG:
+        buffer[0] = 'Q';
+        break;
+    case KNIGHT_PROMO_CAPTURE_FLAG:
+        buffer[0] = 'N';
+        break;
+    case BISHOP_PROMO_CAPTURE_FLAG:
+        buffer[0] = 'B';
+        break;
+    case ROOK_PROMO_CAPTURE_FLAG:
+        buffer[0] = 'R';
+        break;
+    case QUEEN_PROMO_CAPTURE_FLAG:
+        buffer[0] = 'Q';
+        break;
+    default:
+        buffer[0] = '?';
+        break;
+    }
+    buffer[1] = '\0';
 }
 void getLegalMoves(Board *board, Move *moveList, size_t *numMoves)
 {
 
-    //getPawnMoves(board, moveList, numMoves);
+    // getPawnMoves(board, moveList, numMoves);
     getKnightMoves(board, moveList, numMoves);
-    //getBishopMoves(board, moveList, numMoves);
-    //getRookMoves(board, moveList, numMoves);
-    //getQueenMoves(board, moveList, numMoves);
-    //getKingMoves(board, moveList, numMoves);
-
+    // getBishopMoves(board, moveList, numMoves);
+    // getRookMoves(board, moveList, numMoves);
+    // getQueenMoves(board, moveList, numMoves);
+    // getKingMoves(board, moveList, numMoves);
 }

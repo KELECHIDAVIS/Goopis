@@ -69,5 +69,6 @@ extern void addPiece(Board *board, enumPiece color, enumPiece pieceType, enumSqu
 extern void printBB( U64 bb ); 
 extern void printChessBoard(Board *board); 
 extern void printBoardDetails(Board * board); 
+extern void translateSquareToAlgebraic(enumSquare square, char* buffer);
 
 #endif // BOARD_H
