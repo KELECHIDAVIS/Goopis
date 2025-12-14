@@ -344,10 +344,10 @@ static inline void movePiece(Board *board, unsigned int from, unsigned int to, M
         int pos = NO_SQUARE;
         if (side == nWhite){
             capturePawnPos = toBit >> 8;
-            pos = to - 8;
+            pos = (int) to - 8;
         }else{
             capturePawnPos = toBit << 8;
-            pos = to + 8;
+            pos = (int) to + 8;
         }
         board->mailbox[pos] = nWhite; // place empty square where piece used to be
         board->pieces[nPawn] ^= capturePawnPos; // toggle the captured pawn bit off 
@@ -406,10 +406,32 @@ static inline void movePiece(Board *board, unsigned int from, unsigned int to, M
         board->mailbox[rookTo] = nRook;
     }
 }
-//TODO: update Castling rights
-static inline updateCastlingRights(Board* board, enumPiece piece, unsigned int from , unsigned int flags) ; 
+// if move is a rook move update if king move disable castling for side
+static inline void updateCastlingRights(Board* board, enumPiece piece, unsigned int from) {
+    // if king moved turn off castling rights for whole side 
+    if (piece == nKing ){
+        board->castlingRights &= board->whiteToMove ? ~(W_K_CASTLE | W_Q_CASTLE) : ~(B_K_CASTLE | B_Q_CASTLE); 
+    }else{ // rook 
+        switch (from){ // based on which corner move originates from
+            case a1:
+                board->castlingRights &= ~W_Q_CASTLE;     
+                break;
+            case h1:
+                board->castlingRights &= ~W_K_CASTLE;
+                break;
+            case a8:
+                board->castlingRights &= ~B_Q_CASTLE;
+                break;
+            case h8:
+                board->castlingRights &= ~B_K_CASTLE;
+                break;
+            default:
+                break; 
+        }
+    }
+}
 // save state and move made at that board state
-static inline saveBoardState(Board *board, Move move, unsigned int to)
+static inline void saveBoardState(Board *board, Move move, unsigned int to)
 {
     assert(board->historySize >= 0 && board->historySize < MAX_SEARCH_DEPTH && "Tried to save state with invalid history stack size");
 
@@ -432,13 +454,13 @@ void makeMove(Board *board, Move move)
     
     // save the state for this move
     saveBoardState(board, move, to); 
-    
-    updateCastlingRights(board, piece , from, flags); // if move is a rook move update if king move disable castling 
+    if (piece == nRook || nKing)
+        updateCastlingRights(board, piece , from ); 
 
     // reset en passant square
     board->enPassantSquare = NO_SQUARE; // not valid ep square
     if (flags == DOUBLE_PAWN_PUSH_FLAG){ // set ep square to behind the pawn 
-        board->enPassantSquare = board->whiteToMove ? (to- 8) : (to+8) ; 
+        board->enPassantSquare = board->whiteToMove ? ((int)to - 8) : (to+8) ; 
     }
     // update half move clock
     if(piece == nPawn || isCapture(move)){
@@ -456,6 +478,7 @@ void makeMove(Board *board, Move move)
 }
 void unmakeMove(Board *board, Move move)
 {
+    
 }
 void printMove(Move move)
 {
