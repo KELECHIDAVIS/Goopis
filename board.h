@@ -94,7 +94,8 @@ typedef enum
   e8,
   f8,
   g8,
-  h8
+  h8,
+  NO_SQUARE
 } enumSquare;
 typedef enum
 {
