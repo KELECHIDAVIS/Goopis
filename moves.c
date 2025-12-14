@@ -302,42 +302,45 @@ void translateFlagToAlgebraic(const MoveFlag flag, char *buffer)
     }
     buffer[1] = '\0';
 }
-static inline void movePiece(Board *board, unsigned int from , unsigned int to ) {
-    enumPiece side = board->whiteToMove ? nWhite: nBlack; 
-    enumPiece piece; // iterate through pieces till we find a piece at that spot 
-    U64 fromBit = 1ULL << from; 
-    U64 toBit = 1ULL << to; 
-    for (int i =nPawn ; i<=nKing; i++){
-        if ((fromBit & board->pieces[i]) != 0){
-            piece = i ; 
-            break; 
+static inline void movePiece(Board *board, unsigned int from, unsigned int to)
+{
+    enumPiece side = board->whiteToMove ? nWhite : nBlack;
+    enumPiece piece; // iterate through pieces till we find a piece at that spot
+    U64 fromBit = 1ULL << from;
+    U64 toBit = 1ULL << to;
+    for (int i = nPawn; i <= nKing; i++)
+    {
+        if ((fromBit & board->pieces[i]) != 0)
+        {
+            piece = i;
+            break;
         }
     }
-    // has to be valid piece 
-    assert(piece>=nPawn && piece<=nKing && "The piece could not be found in any bb"); 
+    // has to be valid piece
+    assert(piece >= nPawn && piece <= nKing && "The piece could not be found in any bb");
     board->pieces[piece] &= ~fromBit;
     board->pieces[piece] |= toBit;
 }
-static inline void removePiece(Board* board, unsigned int pos){
-
+static inline void removePiece(Board *board, unsigned int pos)
+{
 }
 void makeMove(Board *board, Move move)
 {
-    // reset en passant square 
-    board->enPassantSquare = 0; // not valid ep square 
+    // reset en passant square
+    board->enPassantSquare = 0; // not valid ep square
 
-    unsigned int from = getFrom(move); 
-    unsigned int to = getTo ( move); 
-    unsigned int flags = getFlags(move); 
+    unsigned int from = getFrom(move);
+    unsigned int to = getTo(move);
+    unsigned int flags = getFlags(move);
 
-    // if capture remove captured piece (from side bb and piece bb) 
-        // if en passant have to remove piece above or below destination (depend on side)
+    // if capture remove captured piece (from side bb and piece bb)
+    // if en passant have to remove piece above or below destination (depend on side)
     // move source piece from fromsquare to tosquare (from side bb and piece bb )
-        // if promo put promo piece at to (side bb and piece bb ) //else just put original piece at to (side bb and piece bb )
+    // if promo put promo piece at to (side bb and piece bb ) //else just put original piece at to (side bb and piece bb )
     // if castle move corrensponding rook and king (from side and piece bb's respectively)
 
     // opponent's turn
-    board->whiteToMove = !board->whiteToMove; 
+    board->whiteToMove = !board->whiteToMove;
 }
 void unmakeMove(Board *board, Move move)
 {
