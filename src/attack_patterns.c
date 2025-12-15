@@ -137,8 +137,137 @@ U64 KING_ATTACK_LOOKUP[64] = {
 U64 ROOK_ATTACK_LOOKUP[64][4096] = {0ULL};
 U64 BISHOP_ATTACK_LOOKUP[64][512] = {0ULL};
 
-SMagic BishopMagicTable[64] = {};
-SMagic RookMagicTable[64] = {};
+SMagic BishopMagicTable[64] = {
+    {0x0040201008040200ULL, 0x0022000003240800ULL, 58},
+    {0x0000402010080400ULL, 0x0200180040804d01ULL, 59},
+    {0x0000004020100a00ULL, 0x0002100002a80014ULL, 59},
+    {0x0000000040221400ULL, 0x60403c0006000000ULL, 59},
+    {0x0000000002442800ULL, 0x0005040300000800ULL, 59},
+    {0x0000000204085000ULL, 0x0000549000001081ULL, 59},
+    {0x0000020408102000ULL, 0x2084044000940010ULL, 59},
+    {0x0002040810204000ULL, 0x0010001164300001ULL, 58},
+    {0x0020100804020000ULL, 0x1008400000073000ULL, 59},
+    {0x0040201008040000ULL, 0x0480088001400320ULL, 59},
+    {0x00004020100a0000ULL, 0x0000024400420400ULL, 59},
+    {0x0000004022140000ULL, 0x0000224001400100ULL, 59},
+    {0x0000000244280000ULL, 0x0440130001000000ULL, 59},
+    {0x0000020408500000ULL, 0x0000042024002000ULL, 59},
+    {0x0002040810200000ULL, 0x0805080948086000ULL, 59},
+    {0x0004081020400000ULL, 0x52020220150030e8ULL, 59},
+    {0x0010080402000200ULL, 0x10404204004c0040ULL, 59},
+    {0x0020100804000400ULL, 0x2102000400444008ULL, 59},
+    {0x004020100a000a00ULL, 0x302202001a000000ULL, 57},
+    {0x0000402214001400ULL, 0x0486021500c20411ULL, 57},
+    {0x0000024428002800ULL, 0x0000020942000002ULL, 57},
+    {0x0002040850005000ULL, 0x0a80300540110001ULL, 57},
+    {0x0004081020002000ULL, 0x008a000420350004ULL, 59},
+    {0x0008102040004000ULL, 0x0024010675001420ULL, 59},
+    {0x0008040200020400ULL, 0x0422000030014002ULL, 59},
+    {0x0010080400040800ULL, 0x0200022400085b00ULL, 59},
+    {0x0020100a000a1000ULL, 0x020b404802000500ULL, 57},
+    {0x0040221400142200ULL, 0x4000022000204207ULL, 55},
+    {0x0002442800284400ULL, 0x0020220600040042ULL, 55},
+    {0x0004085000500800ULL, 0x40020b0045101210ULL, 57},
+    {0x0008102000201000ULL, 0x0810411002001000ULL, 59},
+    {0x0010204000402000ULL, 0x2260004000250240ULL, 59},
+    {0x0004020002040800ULL, 0x280e122009000040ULL, 59},
+    {0x0008040004081000ULL, 0x00000a4000205180ULL, 59},
+    {0x00100a000a102000ULL, 0x0000220801000088ULL, 57},
+    {0x0022140014224000ULL, 0x4200200108200804ULL, 55},
+    {0x0044280028440200ULL, 0x0041000400050020ULL, 55},
+    {0x0008500050080400ULL, 0x02102534484a2100ULL, 57},
+    {0x0010200020100800ULL, 0x6000252041480218ULL, 59},
+    {0x0020400040201000ULL, 0x0c0460004142180eULL, 59},
+    {0x0002000204081000ULL, 0x0080121800900062ULL, 59},
+    {0x0004000408102000ULL, 0x0002090401000000ULL, 59},
+    {0x000a000a10204000ULL, 0x00400a8800880220ULL, 57},
+    {0x0014001422400000ULL, 0x0000001c40080280ULL, 57},
+    {0x0028002844020000ULL, 0x0080628401004010ULL, 57},
+    {0x0050005008040200ULL, 0x010c000400a42101ULL, 57},
+    {0x0020002010080400ULL, 0x24080e4011011020ULL, 59},
+    {0x0040004020100800ULL, 0x0208082008210048ULL, 59},
+    {0x0000020408102000ULL, 0x0a003c8008000014ULL, 59},
+    {0x0000040810204000ULL, 0x13a0004002610032ULL, 59},
+    {0x00000a1020400000ULL, 0x0001000400240000ULL, 59},
+    {0x0000142240000000ULL, 0x4210409000c84201ULL, 59},
+    {0x0000284402000000ULL, 0x0314020020131120ULL, 59},
+    {0x0000500804020000ULL, 0x000c110608000941ULL, 59},
+    {0x0000201008040200ULL, 0x3001050020014100ULL, 59},
+    {0x0000402010080400ULL, 0x072a010814210004ULL, 59},
+    {0x0002040810204000ULL, 0x0000040020403800ULL, 58},
+    {0x0004081020400000ULL, 0x4000205004006210ULL, 59},
+    {0x000a102040000000ULL, 0x0140308024040090ULL, 59},
+    {0x0014224000000000ULL, 0x0280100200282002ULL, 59},
+    {0x0028440200000000ULL, 0x0100100418232140ULL, 59},
+    {0x0050080402000000ULL, 0x0800406001002080ULL, 59},
+    {0x0020100804020000ULL, 0x0008200123000108ULL, 59},
+    {0x0040201008040200ULL, 0x0a00008012100260ULL, 58}};
+
+SMagic RookMagicTable[64] = {
+    {0x000101010101017eULL, 0x0004208821280304ULL, 52},
+    {0x000202020202027cULL, 0x0039008000100050ULL, 53},
+    {0x000404040404047aULL, 0x4049040000010840ULL, 53},
+    {0x0008080808080876ULL, 0x0014140400912008ULL, 53},
+    {0x001010101010106eULL, 0x2080040004204000ULL, 53},
+    {0x002020202020205eULL, 0x1125404004100000ULL, 53},
+    {0x004040404040403eULL, 0x0820008010040281ULL, 53},
+    {0x008080808080807eULL, 0x4408448001400200ULL, 52},
+    {0x0001010101017e00ULL, 0x0001004100400000ULL, 53},
+    {0x0002020202027c00ULL, 0x00c0000048001560ULL, 54},
+    {0x0004040404047a00ULL, 0x0062442400200200ULL, 54},
+    {0x0008080808087600ULL, 0x0220328008212032ULL, 54},
+    {0x0010101010106e00ULL, 0x4101000400011001ULL, 54},
+    {0x0020202020205e00ULL, 0x10000082240040c1ULL, 54},
+    {0x0040404040403e00ULL, 0x0001008808421400ULL, 54},
+    {0x0080808080807e00ULL, 0x0010081000200200ULL, 53},
+    {0x00010101017e0100ULL, 0x401c008010000010ULL, 53},
+    {0x00020202027c0200ULL, 0x0848040500003040ULL, 54},
+    {0x00040404047a0400ULL, 0x0000400108021020ULL, 54},
+    {0x0008080808760800ULL, 0x30c0420e0043000aULL, 54},
+    {0x00101010106e1000ULL, 0x2821220201800000ULL, 54},
+    {0x00202020205e2000ULL, 0x00005c0100000020ULL, 54},
+    {0x00404040403e4000ULL, 0x0800080401120100ULL, 54},
+    {0x00808080807e8000ULL, 0x2000402000000000ULL, 53},
+    {0x000101017e010100ULL, 0x4004090800800044ULL, 53},
+    {0x000202027c020200ULL, 0x050a011400001420ULL, 54},
+    {0x000404047a040400ULL, 0x4900160000a00002ULL, 54},
+    {0x0008080876080800ULL, 0x4016000228001801ULL, 54},
+    {0x001010106e101000ULL, 0x0081001820080002ULL, 54},
+    {0x002020205e202000ULL, 0x0240004008000283ULL, 54},
+    {0x004040403e404000ULL, 0x7001045000080002ULL, 54},
+    {0x008080807e808000ULL, 0x0000001004000002ULL, 53},
+    {0x0001017e01010100ULL, 0x00102040040a0000ULL, 53},
+    {0x0002027c02020200ULL, 0x0202000030160200ULL, 54},
+    {0x0004047a04040400ULL, 0x0001102021001000ULL, 54},
+    {0x0008087608080800ULL, 0x0000104202000024ULL, 54},
+    {0x0010106e10101000ULL, 0x000018a0040100b1ULL, 54},
+    {0x0020205e20202000ULL, 0x0020000050080210ULL, 54},
+    {0x0040403e40404000ULL, 0x0050000126000180ULL, 54},
+    {0x0080807e80808000ULL, 0x0000000004040002ULL, 53},
+    {0x00017e0101010100ULL, 0x00200002417a4004ULL, 53},
+    {0x00027c0202020200ULL, 0x0120000001241820ULL, 54},
+    {0x00047a0404040400ULL, 0x0002040200002000ULL, 54},
+    {0x0008760808080800ULL, 0x0064040a0a000380ULL, 54},
+    {0x00106e1010101000ULL, 0x2000000000201140ULL, 54},
+    {0x00205e2020202000ULL, 0x0002100600280824ULL, 54},
+    {0x00403e4040404000ULL, 0x6041000c12100011ULL, 54},
+    {0x00807e8080808000ULL, 0x66c4102000420410ULL, 53},
+    {0x007e010101010100ULL, 0x2003080000001800ULL, 53},
+    {0x007c020202020200ULL, 0x2000056100020060ULL, 54},
+    {0x007a040404040400ULL, 0x000440400c401428ULL, 54},
+    {0x0076080808080800ULL, 0x008004014a400080ULL, 54},
+    {0x006e101010101000ULL, 0x0002008001800120ULL, 54},
+    {0x005e202020202000ULL, 0x00001081022c0000ULL, 54},
+    {0x003e404040404000ULL, 0x2024000600004248ULL, 54},
+    {0x007e808080808000ULL, 0x1100020000000c01ULL, 53},
+    {0x7e01010101010100ULL, 0x000600a005100000ULL, 52},
+    {0x7c02020202020200ULL, 0x40000c1840080180ULL, 53},
+    {0x7a04040404040400ULL, 0x002004a240000008ULL, 53},
+    {0x7608080808080800ULL, 0x0840000003022c83ULL, 53},
+    {0x6e10101010101000ULL, 0x0b84000204000809ULL, 53},
+    {0x5e20202020202000ULL, 0x2049000300003804ULL, 53},
+    {0x3e40404040404000ULL, 0x0084096102314120ULL, 53},
+    {0x7e80808080808000ULL, 0x1004040a2a010480ULL, 52}};
 
 int RBits[64] = {
     12, 11, 11, 11, 11, 11, 11, 12,
@@ -177,11 +306,12 @@ U64 southEast(U64 b) { return (b >> 7) & ~RANK_8 & ~FILE_A; }
 U64 northWest(U64 b) { return (b << 7) & ~FILE_H & ~RANK_1; }
 U64 southWest(U64 b) { return (b >> 9) & ~FILE_H & ~RANK_8; }
 
-// precompute all attacks and save them to a file
+// precompute all attacks and save them to 
 void precomputeAllAttacks(void)
 {
 }
 
+//TODO: make pawn, king, and knight precompute functions write to file for copying 
 void precomputePawnAttacks()
 {
     for (int i = nWhite; i <= nBlack; i++) // for both colors
@@ -380,64 +510,69 @@ U64 createBlockerConfig(int blockerIndex, int numBitsInMask, U64 mask){
 
 // find magic numbers through trial and error
 // based on this code: https://www.chessprogramming.org/Looking_for_Magics
-void findMagicNum(bool isBishop, enumSquare square, int shiftAmt)
+U64 findMagicNum(bool isBishop, enumSquare square)
 {
     U64 mask = isBishop ? BishopMagicTable[square].mask : RookMagicTable[square].mask;
-    U64 blockerConfigs[4096]; // max for rook is 4096 , bishop is 512 
-    U64 attackPatterns[4096]; // found through iteration first 
-    U64 hashTable[4096]; // store attack patterns based on magic indexing 
-    U64 magicNumber;  
-    bool fail =false  ; 
-    int numConfigs,  hashIndex , numBitsInMask;
+    assert(mask != 0 && "Masks weren't initialized prior to calling the findMagicNum function.");
 
-    numBitsInMask = __builtin_popcountll(mask); 
-    numConfigs = 1<<numBitsInMask;  // 2^numBits; 
+    U64 blockerConfigs[4096];
+    U64 attackPatterns[4096];
+    U64 hashTable[4096];
+    U64 magicNumber;
+    int numConfigs, numBitsInMask;
 
-    // for each blocker config, iteratively get the attack pattern for it 
-    for(int i = 0; i< numConfigs; i++){
-        blockerConfigs[i] = createBlockerConfig(i, numBitsInMask, mask); 
-        attackPatterns[i] = isBishop? iterative_getBishopAttackPattern(blockerConfigs[i], square) : iterative_getRookAttackPattern(blockerConfigs[i], square)   ;  
+    numBitsInMask = __builtin_popcountll(mask);
+    numConfigs = 1 << numBitsInMask;
+
+    // Generate all blocker configurations and attack patterns
+    for (int i = 0; i < numConfigs; i++)
+    {
+        blockerConfigs[i] = createBlockerConfig(i, numBitsInMask, mask);
+        attackPatterns[i] = isBishop ? iterative_getBishopAttackPattern(blockerConfigs[i], square) : iterative_getRookAttackPattern(blockerConfigs[i], square);
     }
 
-    // now try to generate random numbers that can perfectly hash the blocker config to a spot in the hashTable without any non-contructive collisions
-    for(int z = 0; z < 100000000; z++){
+    int shiftAmt = 64 - numBitsInMask;
+
+    // Try random magic numbers
+    for (int z = 0; z < 100000000; z++)
+    {
         magicNumber = randU64() & randU64() & randU64();
-        int numSetBits = __builtin_popcountll((mask * magicNumber) & 0xFF00000000000000ULL); 
-        if(numSetBits < 6) continue; 
 
-        for (int i =0; i<4096; i++) hashTable [i] = 0ULL;
+        // Skip if not enough bits in upper byte
+        int numSetBits = __builtin_popcountll((mask * magicNumber) & 0xFF00000000000000ULL);
+        if (numSetBits < 6)
+            continue;
 
-        for (int i = 0, fail = false; !fail && i < numConfigs; i++)
+        // Clear hash table
+        memset(hashTable, 0, sizeof(hashTable));
+
+        // Test this magic number
+        bool fail = false;
+        for (int i = 0; i < numConfigs && !fail; i++)
         {
-            SMagic entry ={
-                .magic  = magicNumber,
-                .mask = mask,
-                .shiftAmt = shiftAmt,
-            }; 
-            hashIndex= magicIndex(&entry , blockerConfigs[i]);
+            int hashIndex = (int)((blockerConfigs[i] * magicNumber) >> shiftAmt);
 
             if (hashTable[hashIndex] == 0ULL)
+            {
                 hashTable[hashIndex] = attackPatterns[i];
+            }
             else if (hashTable[hashIndex] != attackPatterns[i])
-                fail = true;
-        }
-        if (!fail){
-            if(isBishop){
-                BishopMagicTable [square].magic = magicNumber; 
-                BishopMagicTable[square].mask = mask; 
-                BishopMagicTable[square].shiftAmt = shiftAmt; 
-            }else{
-                RookMagicTable[square].magic = magicNumber;
-                RookMagicTable[square].mask = mask;
-                RookMagicTable[square].shiftAmt = shiftAmt;
+            {
+                fail = true; // Non-constructive collision
             }
         }
-    }
-    if(fail){
-        printf("Magic generation for square %d failed after 100000000 attempts. Closing Program...", square)   ; 
-        abort(); 
+
+        // If no collisions, we found a valid magic!
+        if (!fail)
+        {
+            return magicNumber;
+        }
     }
 
+    // Failed to find magic after all attempts
+    printf("Magic generation for square %d (%s) failed after 100000000 attempts.\n",
+           square, isBishop ? "Bishop" : "Rook");
+    return 0;
 }
 void printPawnAttacks()
 {
@@ -481,17 +616,24 @@ void precomputeMagicNumbersAndSaveToFile(){
     {
         int bitsSet = __builtin_popcountll(BishopMagicTable[square].mask);
         int shiftAmt = 64 - bitsSet;
-        findMagicNum(true, square, shiftAmt);
+        U64 magic =  findMagicNum(true, square);
 
+        
         printf("Square %2d: { 0x%016llx, 0x%016llx, %d }\n",
                square, BishopMagicTable[square].mask,
-               BishopMagicTable[square].magic,
-               BishopMagicTable[square].shiftAmt);
+               magic ,
+               shiftAmt);
+
+        if (magic == 0)
+        {
+            printf("Magic Generation failed, Returned magic number was zero"); 
+            abort(); 
+        }
 
         fprintf(fp, "    { 0x%016llxULL, 0x%016llxULL, %d }%s\n",
                 BishopMagicTable[square].mask,
-                BishopMagicTable[square].magic,
-                BishopMagicTable[square].shiftAmt,
+                magic,
+                shiftAmt,
                 square < 63 ? "," : "");
     }
     fprintf(fp, "};\n");
@@ -514,20 +656,81 @@ void precomputeMagicNumbersAndSaveToFile(){
     {
         int bitsSet = __builtin_popcountll(RookMagicTable[square].mask);
         int shiftAmt = 64 - bitsSet;
-        findMagicNum(false, square, shiftAmt);
+        U64 magic = findMagicNum(false, square);
 
         printf("Square %2d: { 0x%016llx, 0x%016llx, %d }\n",
                square, RookMagicTable[square].mask,
-               RookMagicTable[square].magic,
-               RookMagicTable[square].shiftAmt);
+               magic,
+               shiftAmt);
 
+        if (magic == 0)
+        {
+            printf("Magic Generation failed, Returned magic number was zero");
+            abort();
+        }
         fprintf(fp2, "    { 0x%016llxULL, 0x%016llxULL, %d }%s\n",
                 RookMagicTable[square].mask,
-                RookMagicTable[square].magic,
-                RookMagicTable[square].shiftAmt,
+                magic,
+                shiftAmt,
                 square < 63 ? "," : "");
     }
     fprintf(fp2, "};\n");
     fclose(fp2);
     printf("Rook magic numbers saved to rook_magic_structs.txt\n");
+}
+
+// call this function after magic number have been precomputed and copy and pasted into the smagic tables 
+void precomputeSlidingPieceLookupTablesAndSaveToFile(){
+    //first rook then bishop  
+    for(int isBishop=0; isBishop <=1; isBishop++){
+        for (int square = 0; square < 64; square++)
+        {
+            SMagic entry = isBishop ? BishopMagicTable[square] : RookMagicTable[square];
+            U64 mask = entry.mask; 
+
+            int numConfigs,  numBitsInMask;
+
+            numBitsInMask = __builtin_popcountll(mask);
+            numConfigs = 1 << numBitsInMask; // 2^numBits;
+
+            
+            // for each blocker config, iteratively get the attack pattern for it
+            for (int i = 0; i < numConfigs; i++)
+            {
+                U64 blockers = createBlockerConfig(i, numBitsInMask, mask);
+                U64 attackPattern = isBishop ? iterative_getBishopAttackPattern(blockers, square) : iterative_getRookAttackPattern(blockers, square);
+                
+                int hashIndex =magicIndex(&entry, blockers);
+
+                printf("Hash Index %d\n", hashIndex);
+                printf("Blocker Config %d: \n", i);
+                printBB(blockers);
+                puts("Attack Pattern");
+                printBB(attackPattern);
+
+                // check for non constructive collisions 
+                U64 *hashTable = isBishop ? BISHOP_ATTACK_LOOKUP[square] : ROOK_ATTACK_LOOKUP[square];  
+
+                if(hashTable[hashIndex] == 0ULL){
+                    hashTable[hashIndex] = attackPattern; 
+                }else if (hashTable[hashIndex] != attackPattern){ // Non Constructive collsion
+                    printf("Non Constructive Collision occured in %s initialization in Square %d \n", 
+                        isBishop ? "Bishop" : "Rook"   ,
+                        square
+                    ); 
+                    printf("Hash Index %d\n", hashIndex); 
+                    printf("Blocker Config %d: \n", i); 
+                    printBB(blockers)   ; 
+                    puts("Attack Pattern"); 
+                    printBB(attackPattern); 
+
+                    puts("Closing Program ..."); 
+                    abort(); 
+
+                }
+            }
+
+        }
+    }
+    
 }

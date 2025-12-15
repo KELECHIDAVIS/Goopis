@@ -29,13 +29,10 @@ extern void precomputePawnAttacks(void);
 extern void precomputeKingAttacks(void);
 extern void precomputeRookMasks(void);
 extern void precomputeBishopMasks(void);
-extern void findMagicNum(bool isBishop, enumSquare square, int shiftAmt); // continuoslly loop until we find a valid magic number  
+extern U64 findMagicNum(bool isBishop, enumSquare square); // continuoslly loop until we find a valid magic number  
 // get index within hashtable 
 static inline int magicIndex(SMagic* entry , U64 blockers){
-    blockers &= entry->mask; // get blockers within rays
-    U64 hash = blockers * entry->magic;  
-    int index =  (int) (hash >> entry->shiftAmt); 
-    return index; 
+    return (int)((blockers* entry->magic) >> (entry->shiftAmt));
 }
 static inline U64 randU64()
 {
@@ -105,5 +102,6 @@ static inline U64 getQueenAttackPattern(enumSquare square, U64 occupancy)
 // Debug/utility functions
 extern void printKnightAttacks(void);
 extern void printPawnAttacks(void);
-extern void precomputeMagicNumbersAndSaveToFile(void); 
+extern void precomputeMagicNumbersAndSaveToFile(void);
+extern void precomputeSlidingPieceLookupTablesAndSaveToFile(void); 
 #endif // ATTACKS_H

@@ -3,6 +3,6 @@
 
 int main()
 {
-
+    precomputeMagicNumbersAndSaveToFile(); 
     return 0;
 }
