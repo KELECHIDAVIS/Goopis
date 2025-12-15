@@ -25,9 +25,9 @@ int main()
     //     translateFlagToAlgebraic((MoveFlag)getFlags(move), flagAlgebraic);
     //     printf("Move %zu: %s to %s, Flag: %s\n", i + 1, fromAlgebraic, toAlgebraic, flagAlgebraic);
     // }
-    precomputeKingAttacks(); 
+    precomputeBishopMasks(); 
     for (int i=0 ; i< 64 ; i++){
-        printBB(KING_ATTACK_LOOKUP[i]); 
+        printBB(BishopMagicTable[i].mask); 
     }
     return 0;
 }

@@ -8,15 +8,26 @@ extern U64 KNIGHT_ATTACK_LOOKUP[64];
 extern U64 PAWN_ATTACK_LOOKUP[2][64];
 extern U64 KING_ATTACK_LOOKUP[64]; 
 
-// Future: Magic bitboards for sliding pieces
-// extern U64 ROOK_ATTACK_TABLE[64][4096];
-// extern U64 BISHOP_ATTACK_TABLE[64][512];
+//Magic bb stuff for sliding pieces 
+extern U64 ROOK_ATTACK_LOOKUP[64][4096]; // 2048K 
+extern U64 BISHOP_ATTACK_LOOKUP[64][512]; // 256 K
+
+typedef struct {
+    U64 mask; // relevant blocking squares at pos 
+    U64 magic ; 
+}SMagic;
+
+// where magic numbers and relevant masks for each square are stored 
+extern SMagic BishopMagicTable[64];
+extern SMagic RookMagicTable[64];
 
 // Initialization functions
 extern void precomputeAllAttacks(void); // Call this once at startup
 extern void precomputeKnightAttacks(void);
 extern void precomputePawnAttacks(void);
 extern void precomputeKingAttacks(void);
+extern void precomputeRookMasks(void);
+extern void precomputeBishopMasks(void);
 
 // Attack pattern getters (inline for performance)
 static inline U64 getKnightAttackPattern(enumSquare square)

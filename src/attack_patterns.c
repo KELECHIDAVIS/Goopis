@@ -134,6 +134,12 @@ U64 KING_ATTACK_LOOKUP[64] ={
 
 }; 
 
+U64 ROOK_ATTACK_LOOKUP[64] [4096] ={}; 
+U64 BISHOP_ATTACK_LOOKUP[64][512] ={}; 
+
+SMagic BishopMagicTable [64] = {}; 
+SMagic RookMagicTable [64] ={}; 
+
 U64 noNoEa(U64 b) { return (b << 17) & ~FILE_A; }
 U64 noEaEa(U64 b) { return (b << 10) & ~(FILE_A | FILE_B); }
 U64 soEaEa(U64 b) { return (b >> 6) & ~(FILE_A | FILE_B); }
@@ -224,6 +230,42 @@ void precomputeKnightAttacks()
         KNIGHT_ATTACK_LOOKUP[square] = attacks;
     }
 }
+
+// precomputes the relevant blocking squares for each square (code from:https://www.chessprogramming.org/Looking_for_Magics )
+void precomputeRookMasks(){
+    for (int sq = 0; sq<64; sq++){
+        U64 result = 0ULL;
+        int rk = sq / 8, fl = sq % 8, r, f;
+        for (r = rk + 1; r <= 6; r++)
+            result |= (1ULL << (fl + r * 8));
+        for (r = rk - 1; r >= 1; r--)
+            result |= (1ULL << (fl + r * 8));
+        for (f = fl + 1; f <= 6; f++)
+            result |= (1ULL << (f + rk * 8));
+        for (f = fl - 1; f >= 1; f--)
+            result |= (1ULL << (f + rk * 8));
+
+        RookMagicTable[sq].mask = result; 
+    }
+}
+void precomputeBishopMasks(){
+    for (int sq = 0; sq < 64; sq++)
+    {
+        U64 result = 0ULL;
+        int rk = sq / 8, fl = sq % 8, r, f;
+        for (r = rk + 1, f = fl + 1; r <= 6 && f <= 6; r++, f++)
+            result |= (1ULL << (f + r * 8));
+        for (r = rk + 1, f = fl - 1; r <= 6 && f >= 1; r++, f--)
+            result |= (1ULL << (f + r * 8));
+        for (r = rk - 1, f = fl + 1; r >= 1 && f <= 6; r--, f++)
+            result |= (1ULL << (f + r * 8));
+        for (r = rk - 1, f = fl - 1; r >= 1 && f >= 1; r--, f--)
+            result |= (1ULL << (f + r * 8));
+
+        BishopMagicTable[sq].mask = result;
+    }
+}
+
 void printPawnAttacks()
 {
     for (int i = nWhite; i <= nBlack; i++) // for both colors
