@@ -3,6 +3,6 @@
 
 int main()
 {
-    precomputeMagicNumbersAndSaveToFile(); 
+    precomputeSlidingPieceLookupTablesAndSaveToFile();  
     return 0;
 }
