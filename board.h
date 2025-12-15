@@ -117,10 +117,9 @@ typedef struct
 {
   Move move;
   unsigned char castlingRights;
-  bool whiteToMove; 
   enumSquare enPassantSquare;
   unsigned short halfmoveClock;
-  unsigned short fullMoveNumber; 
+  unsigned short fullMoveNumber;
   enumPiece capturedPiece;
 } MoveHistory;
 
@@ -134,8 +133,8 @@ typedef struct
   enumSquare enPassantSquare;    // square that can be captured via en passant
   unsigned short halfmoveClock;  // for 50 move rule
   unsigned short fullmoveNumber; // starts at 1 and increments after
-  MoveHistory historyStack[MAX_SEARCH_DEPTH];
-  int historySize;
+  MoveHistory historyArr[MAX_SEARCH_DEPTH];
+  int historyPly;
 } Board;
 
 extern U64 getAllPieces(const Board *board);
@@ -148,6 +147,6 @@ extern void printBB(U64 bb);
 extern void printChessBoard(Board *board);
 extern void printBoardDetails(Board *board);
 extern void translateSquareToAlgebraic(enumSquare square, char *buffer);
-static inline bool isOppInCheck(const Board *board);
-static bool isSideToMoveInCheck(const Board *board);
+// static inline bool isOppInCheck(const Board *board);
+// static bool isSideToMoveInCheck(const Board *board);
 #endif // BOARD_H

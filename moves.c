@@ -139,6 +139,15 @@ U64 noWeWe(U64 b) { return (b << 6) & ~(FILE_G | FILE_H); }
 U64 soWeWe(U64 b) { return (b >> 10) & ~(FILE_G | FILE_H); }
 U64 soSoWe(U64 b) { return (b >> 17) & ~FILE_H; }
 
+inline U64 getPawnAttackPattern(const enumSquare fromSquare, const enumPiece side)
+{
+    return PAWN_ATTACK_LOOKUP[side][fromSquare];
+}
+
+inline U64 getKnightAttackPattern(enumSquare square)
+{
+    return KNIGHT_ATTACK_LOOKUP[square];
+}
 void precomputeKnightAttacks()
 {
     for (int square = 0; square < 64; square++)
@@ -168,10 +177,7 @@ void printKnightAttacks()
     }
 }
 
-inline U64 getKnightAttackPattern(enumSquare square)
-{
-    return KNIGHT_ATTACK_LOOKUP[square];
-}
+
 
 void precomputePawnAttacks()
 {
@@ -302,8 +308,37 @@ void translateFlagToAlgebraic(const MoveFlag flag, char *buffer)
     }
     buffer[1] = '\0';
 }
+// if move is a rook move update if king move disable castling for side
+static void updateCastlingRights(Board *board, enumPiece piece, unsigned int from)
+{
+    // if king moved turn off castling rights for whole side
+    if (piece == nKing)
+    {
+        board->castlingRights &= board->whiteToMove ? (unsigned char)(~(W_K_CASTLE | W_Q_CASTLE)) : (unsigned char)(~(B_K_CASTLE | B_Q_CASTLE));
+    }
+    else
+    { // rook
+        switch (from)
+        { // based on which corner move originates from
+        case a1:
+            board->castlingRights &= (unsigned char)~W_Q_CASTLE;
+            break;
+        case h1:
+            board->castlingRights &= (unsigned char)~W_K_CASTLE;
+            break;
+        case a8:
+            board->castlingRights &= (unsigned char)~B_Q_CASTLE;
+            break;
+        case h8:
+            board->castlingRights &= (unsigned char)~B_K_CASTLE;
+            break;
+        default:
+            break;
+        }
+    }
+}
 // Moves Piece and updates it's bb, side bb and mailbox. If a piece was captured then update their side's bb and piece bb
-static inline void movePiece(Board *board, unsigned int from, unsigned int to, MoveFlag flags)
+void movePiece(Board *board, unsigned int from, unsigned int to, MoveFlag flags)
 {
     enumPiece side = nWhite;
     enumPiece oppSide = nBlack;
@@ -330,66 +365,80 @@ static inline void movePiece(Board *board, unsigned int from, unsigned int to, M
     board->mailbox[from] = nWhite; // no piece
     board->mailbox[to] = piece;
 
+    
     if (capturedPiece >= nPawn && capturedPiece <= nKing)
     {
         // update captured piece's sidebb , piece bb
         board->pieces[capturedPiece] ^= toBit;
         board->pieces[oppSide] ^= toBit;
+
+        // if a capture was a rook have to update castling rights
+        if (capturedPiece == nRook)
+            updateCastlingRights(board, nRook, to); // where the rook is
+
+        
     }
 
-    // SPECIAL FLAG CASES 
+    // SPECIAL FLAG CASES
     // if en passant have to remove pawn above or below destination (depend on side)
-    if (flags == EN_PASSANT_CAPTURE_FLAG){
+    if (flags == EN_PASSANT_CAPTURE_FLAG)
+    {
         U64 capturePawnPos = 0;
         int pos = NO_SQUARE;
-        if (side == nWhite){
+        if (side == nWhite)
+        {
             capturePawnPos = toBit >> 8;
-            pos = (int) to - 8;
-        }else{
+            pos = (int)to - 8;
+        }
+        else
+        {
             capturePawnPos = toBit << 8;
-            pos = (int) to + 8;
+            pos = (int)to + 8;
         }
-        board->mailbox[pos] = nWhite; // place empty square where piece used to be
-        board->pieces[nPawn] ^= capturePawnPos; // toggle the captured pawn bit off 
-        board->pieces[oppSide] ^= capturePawnPos;  // in the side aswell 
+        board->mailbox[pos] = nWhite;             // place empty square where piece used to be
+        board->pieces[nPawn] ^= capturePawnPos;   // toggle the captured pawn bit off
+        board->pieces[oppSide] ^= capturePawnPos; // in the side aswell
     }
-    
-    // if promo, put promo piece at to (side bb and piece bb ) 
-    if (flags >= KNIGHT_PROMOTION_FLAG && flags<=QUEEN_PROMO_CAPTURE_FLAG){
+
+    // if promo, put promo piece at to (side bb and piece bb )
+    if (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG)
+    {
         // capture should already be taken care of
-        board->pieces[nPawn] ^= toBit; // remove pawn 
-        enumPiece promoPiece= nQueen; // assume queen 
-        switch (flags){
-            case KNIGHT_PROMOTION_FLAG:
-            case KNIGHT_PROMO_CAPTURE_FLAG:
-                promoPiece = nKnight; 
-                break;
-            case BISHOP_PROMOTION_FLAG:
-            case BISHOP_PROMO_CAPTURE_FLAG:
-                promoPiece = nBishop;
-                break;
-            case ROOK_PROMOTION_FLAG:
-            case ROOK_PROMO_CAPTURE_FLAG:
-                promoPiece = nRook;
-                break;
-            case QUEEN_PROMOTION_FLAG:
-            case QUEEN_PROMO_CAPTURE_FLAG:
-                promoPiece = nQueen;
-                break;
-            default:
-                printf("Nonvalid promo piece type within promoflag check. Flag value should be between %d and %d. Was: %d: ", KNIGHT_PROMOTION_FLAG, QUEEN_PROMO_CAPTURE_FLAG, flags); 
-                abort(); 
+        board->pieces[nPawn] ^= toBit; // remove pawn
+        enumPiece promoPiece = nQueen; // assume queen
+        switch (flags)
+        {
+        case KNIGHT_PROMOTION_FLAG:
+        case KNIGHT_PROMO_CAPTURE_FLAG:
+            promoPiece = nKnight;
+            break;
+        case BISHOP_PROMOTION_FLAG:
+        case BISHOP_PROMO_CAPTURE_FLAG:
+            promoPiece = nBishop;
+            break;
+        case ROOK_PROMOTION_FLAG:
+        case ROOK_PROMO_CAPTURE_FLAG:
+            promoPiece = nRook;
+            break;
+        case QUEEN_PROMOTION_FLAG:
+        case QUEEN_PROMO_CAPTURE_FLAG:
+            promoPiece = nQueen;
+            break;
+        default:
+            printf("Nonvalid promo piece type within promoflag check. Flag value should be between %d and %d. Was: %d: ", KNIGHT_PROMOTION_FLAG, QUEEN_PROMO_CAPTURE_FLAG, flags);
+            abort();
         }
-        board->pieces[promoPiece]  ^= toBit; // place promo piece 
-        board->mailbox[to] = promoPiece; // update mailbox 
+        board->pieces[promoPiece] ^= toBit; // place promo piece
+        board->mailbox[to] = promoPiece;    // update mailbox
     }
-    
+
     // if castle move corrensponding rook (from side and piece bb's respectively) (the king will already have moved )
-    if (flags == KING_CASTLE_FLAG || QUEEN_CASTLE_FLAG)
+    if (flags == KING_CASTLE_FLAG || flags == QUEEN_CASTLE_FLAG)
     {
         unsigned int rookFrom = side == nWhite ? h1 : h8;
         unsigned int rookTo = side == nWhite ? f1 : f8;
-        if( QUEEN_CASTLE_FLAG){
+        if (flags == QUEEN_CASTLE_FLAG)
+        {
             rookFrom = side == nWhite ? a1 : a8;
             rookTo = side == nWhite ? d1 : d8;
         }
@@ -400,85 +449,175 @@ static inline void movePiece(Board *board, unsigned int from, unsigned int to, M
         board->pieces[nRook] |= rookToBit;
         board->pieces[side] ^= rookFromBit;
         board->pieces[side] |= rookToBit;
-        
+
         // Update mailbox
         board->mailbox[rookFrom] = nWhite;
         board->mailbox[rookTo] = nRook;
     }
 }
-// if move is a rook move update if king move disable castling for side
-static inline void updateCastlingRights(Board* board, enumPiece piece, unsigned int from) {
-    // if king moved turn off castling rights for whole side 
-    if (piece == nKing ){
-        board->castlingRights &= board->whiteToMove ? ~(W_K_CASTLE | W_Q_CASTLE) : ~(B_K_CASTLE | B_Q_CASTLE); 
-    }else{ // rook 
-        switch (from){ // based on which corner move originates from
-            case a1:
-                board->castlingRights &= ~W_Q_CASTLE;     
-                break;
-            case h1:
-                board->castlingRights &= ~W_K_CASTLE;
-                break;
-            case a8:
-                board->castlingRights &= ~B_Q_CASTLE;
-                break;
-            case h8:
-                board->castlingRights &= ~B_K_CASTLE;
-                break;
-            default:
-                break; 
-        }
-    }
-}
-// save state and move made at that board state
-static inline void saveBoardState(Board *board, Move move, unsigned int to)
-{
-    assert(board->historySize >= 0 && board->historySize < MAX_SEARCH_DEPTH && "Tried to save state with invalid history stack size");
 
-    board->historyStack[board->historySize].move = move;
-    board->historyStack[board->historySize].castlingRights = board->castlingRights;
-    board->historyStack[board->historySize].enPassantSquare = board->enPassantSquare;
-    board->historyStack[board->historySize].halfmoveClock = board->halfmoveClock;
-    board->historyStack[board->historySize].fullMoveNumber = board->fullmoveNumber;
-    board->historyStack[board->historySize].capturedPiece = board->mailbox[getTo(move)];
-    board->historyStack[board->historySize].whiteToMove = board->whiteToMove; 
-    board->historySize++;
+// save state and move made at that board state
+void saveBoardState(Board *board, Move move)
+{
+    assert(board->historyPly >= 0 && board->historyPly < MAX_SEARCH_DEPTH && "Tried to save state with invalid history stack size");
+
+    board->historyArr[board->historyPly].move = move;
+    board->historyArr[board->historyPly].castlingRights = board->castlingRights;
+    board->historyArr[board->historyPly].enPassantSquare = board->enPassantSquare;
+    board->historyArr[board->historyPly].halfmoveClock = board->halfmoveClock;
+    board->historyArr[board->historyPly].fullMoveNumber = board->fullmoveNumber;
+    unsigned int to= getTo(move); 
+    if (getFlags(move) == EN_PASSANT_CAPTURE_FLAG){
+        // depending on the side, the captured pawn is above or below
+        int capturedPawnPos = (int)to;
+        capturedPawnPos += board->whiteToMove ? -8 : 8;
+        board->historyArr[board->historyPly].capturedPiece = board->mailbox[capturedPawnPos];
+    }else{
+        board->historyArr[board->historyPly].capturedPiece = board->mailbox[to];
+    }
+    board->historyPly++;
 }
 void makeMove(Board *board, Move move)
 {
-    
+
     unsigned int from = getFrom(move);
     unsigned int to = getTo(move);
     unsigned int flags = getFlags(move);
-    enumPiece piece = board->mailbox[from]; 
-    
+    enumPiece piece = board->mailbox[from];
+
     // save the state for this move
-    saveBoardState(board, move, to); 
-    if (piece == nRook || nKing)
-        updateCastlingRights(board, piece , from ); 
+    saveBoardState(board, move);
+    if (piece == nRook || piece ==  nKing)
+        updateCastlingRights(board, piece, from);
 
     // reset en passant square
     board->enPassantSquare = NO_SQUARE; // not valid ep square
-    if (flags == DOUBLE_PAWN_PUSH_FLAG){ // set ep square to behind the pawn 
-        board->enPassantSquare = board->whiteToMove ? ((int)to - 8) : (to+8) ; 
+    if (flags == DOUBLE_PAWN_PUSH_FLAG)
+    { // set ep square to behind/above the pawn
+        int capturedPawnPos = (int)to;
+        capturedPawnPos += board->whiteToMove ? -8 : 8;
+        board->enPassantSquare = capturedPawnPos; 
     }
     // update half move clock
-    if(piece == nPawn || isCapture(move)){
-        board->halfmoveClock = 0 ; 
-    }else{
-        board->halfmoveClock ++; 
+    if (piece == nPawn || isCapture(move))
+    {
+        board->halfmoveClock = 0;
+    }
+    else
+    {
+        board->halfmoveClock++;
     }
     // move piece
-    movePiece(board , from , to , flags );
+    movePiece(board, from, to, flags);
     // update full move counter
-    if (!board->whiteToMove) // after every black move 
-        board->fullmoveNumber ++; 
+    if (!board->whiteToMove) // after every black move
+        board->fullmoveNumber++;
     // opponent's turn
     board->whiteToMove = !board->whiteToMove;
 }
+
+// unmove moved piece(s), including rooks if a castled occurred, promo pieces if promo occurred, and enpassant if that occured  
+void unmovePiece(Board *board , Move move , enumPiece capturedPiece){
+    unsigned int from = getFrom(move);
+    unsigned int to = getTo(move);
+    unsigned int flags= getFlags(move);
+
+    enumPiece side = nWhite;
+    enumPiece oppSide = nBlack;
+    // whichever side was the mover in last state 
+    if (board->whiteToMove) // if it's currently white to move that means black went last 
+    {
+        side = nBlack;
+        oppSide = nWhite;
+    }
+    U64 fromBit = 1ULL << from;
+    U64 toBit = 1ULL << to;
+
+    // use mailbox to see which piece was at that spot
+    // ** IF PROMO LAST TURN THIS CONTAINS PROMOTED PIECE
+    enumPiece piece = board->mailbox[to];
+
+    // has to be valid piece
+    assert(piece >= nPawn && piece <= nKing && "The piece could not be found in any bb");
+    // move from piece bb
+    board->pieces[piece] &= ~toBit; // unset to bit 
+    board->pieces[piece] |= fromBit;   // move back 
+
+    // move from side bb
+    board->pieces[side] ^= (fromBit | toBit); // both guarenteed to be set and unset
+    // update unmove in mailbox 
+    board->mailbox[to] = capturedPiece; // no piece if none captured
+    board->mailbox[from] = piece;
+
+    if (capturedPiece >= nPawn && capturedPiece <= nKing)
+    {
+        // update captured piece's sidebb , piece bb
+        board->pieces[capturedPiece] ^= toBit; //toggle bit 
+        board->pieces[oppSide] ^= toBit; // toggle bit 
+    }
+
+    // special cases
+    //  if en passant place captured piece below to bit 
+    if (flags == EN_PASSANT_CAPTURE_FLAG){
+        U64 capturePawnPos = 0;
+        int pos = NO_SQUARE;
+        if (side == nWhite){
+            capturePawnPos = toBit >> 8;
+            pos = (int)to - 8;
+        }
+        else{
+            capturePawnPos = toBit << 8;
+            pos = (int)to + 8;
+        }
+        board->mailbox[pos] = nPawn;             // place empty square where piece used to be
+        board->pieces[nPawn] ^= capturePawnPos;   // toggle the captured pawn bit on
+        board->pieces[oppSide] ^= capturePawnPos; // in the side aswell
+    }
+
+    // if promo, remove promo piece from dest 
+    if (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG){
+        // remove promo piece from from square 
+        board->pieces[piece] &= ~fromBit; 
+        board->pieces[nPawn] |= fromBit; // place pawn back 
+        board->mailbox[from] = nPawn;    // update mailbox
+    }
+
+    // if castling place rook back where it came (king alr moved back)
+    if (flags == KING_CASTLE_FLAG || flags== QUEEN_CASTLE_FLAG){
+        unsigned int rookFrom = side == nWhite ? f1 : f8;
+        unsigned int rookTo = side == nWhite ? h1 : h8;
+        if (flags== QUEEN_CASTLE_FLAG)
+        {
+            rookFrom = side == nWhite ? d1 : d8;
+            rookTo = side == nWhite ? a1 : a8;
+        }
+        U64 rookFromBit = 1ULL << rookFrom;
+        U64 rookToBit = 1ULL << rookTo;
+
+        board->pieces[nRook] ^= rookFromBit;
+        board->pieces[nRook] |= rookToBit;
+        board->pieces[side] ^= rookFromBit;
+        board->pieces[side] |= rookToBit;
+
+        // Update mailbox
+        board->mailbox[rookFrom] = nWhite; 
+        board->mailbox[rookTo] = nRook;
+    }
+}
 void unmakeMove(Board *board, Move move)
 {
-    
+    // retrieve previous state from history stack
+    board->historyPly--;
+    MoveHistory *lastState = &board->historyArr[board->historyPly];
+
+    unmovePiece(board, move, lastState->capturedPiece );
+
+    // reinstate board state variables
+    board->castlingRights = lastState->castlingRights;
+    board->enPassantSquare = lastState->enPassantSquare;
+    board->halfmoveClock = lastState->halfmoveClock;
+    board->fullmoveNumber = lastState->fullMoveNumber; 
+    board->whiteToMove= !board->whiteToMove; 
 }
 void printMove(Move move)
 {
@@ -525,10 +664,7 @@ static inline U64 getDoublePushPattern(const U64 emptySquares, const U64 singleP
     }
 }
 
-inline U64 getPawnAttackPattern(const enumSquare fromSquare, const enumPiece side)
-{
-    return PAWN_ATTACK_LOOKUP[side][fromSquare];
-}
+
 void getPawnMoves(const Board *board, Move *moveList, size_t *numMoves)
 {
     enumPiece side = board->whiteToMove ? nWhite : nBlack;
