@@ -140,6 +140,26 @@ U64 BISHOP_ATTACK_LOOKUP[64][512] = {0ULL};
 SMagic BishopMagicTable[64] = {};
 SMagic RookMagicTable[64] = {};
 
+int RBits[64] = {
+    12, 11, 11, 11, 11, 11, 11, 12,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    11, 10, 10, 10, 10, 10, 10, 11,
+    12, 11, 11, 11, 11, 11, 11, 12};
+
+int BBits[64] = {
+    6, 5, 5, 5, 5, 5, 5, 6,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    5, 5, 7, 7, 7, 7, 5, 5,
+    5, 5, 7, 9, 9, 7, 5, 5,
+    5, 5, 7, 9, 9, 7, 5, 5,
+    5, 5, 7, 7, 7, 7, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5,
+    6, 5, 5, 5, 5, 5, 5, 6};
+
 U64 noNoEa(U64 b) { return (b << 17) & ~FILE_A; }
 U64 noEaEa(U64 b) { return (b << 10) & ~(FILE_A | FILE_B); }
 U64 soEaEa(U64 b) { return (b >> 6) & ~(FILE_A | FILE_B); }
@@ -273,6 +293,7 @@ void precomputeBishopMasks()
 // create all possible blocking configurations from the movementMask passed in
 void createAllBlockerBitboards(U64 movementMask, U64 *blockerBitBoards, int *numConfigs)
 {
+    // TODO: remove all debug print statements 
     // the max amount of bits in relevant blocker mask on for rook :12 , bishop:9
     // create list of indices of the bits that are set in the movement mask
     int size = 0;
@@ -283,6 +304,7 @@ void createAllBlockerBitboards(U64 movementMask, U64 *blockerBitBoards, int *num
         if (((movementMask >> i) & 1) == 1)
         {
             moveSquareIndices[size++] = i; // index of set bit
+            
         }
     }
 
