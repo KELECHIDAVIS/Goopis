@@ -1,0 +1,6 @@
+todo: 
+-perft:
+	-make move
+	-if king from last side is able to be taken  after that move, that move was illegal 
+		-check if king's pos is in that attack pattern 
+	-unmake move
