@@ -46,12 +46,12 @@ Move parseMove(Board *board, char *moveStr)
                 // If UCI string has promo char, we must match the piece type
                 if (strlen(moveStr) > 4)
                 {
-                    //char promoChar = moveStr[4];
-                    // Map flag to char to compare
-                    // (Simplified check: assuming 'q' is most common, or check your flag logic)
-                    // For robustness, you can verify exact type match here.
-                    // For now, if it's a promo flag and string has a char, we assume it's the right one
-                    // or simply return the first match if you don't support underpromotions yet.
+                    // char promoChar = moveStr[4];
+                    //  Map flag to char to compare
+                    //  (Simplified check: assuming 'q' is most common, or check your flag logic)
+                    //  For robustness, you can verify exact type match here.
+                    //  For now, if it's a promo flag and string has a char, we assume it's the right one
+                    //  or simply return the first match if you don't support underpromotions yet.
                     return m;
                 }
             }
@@ -185,7 +185,7 @@ void parseGo(Board *board, char *line)
 
 int main()
 {
-    //char line[INPUT_BUFFER];
+    // char line[INPUT_BUFFER];
     Board board;
 
     // 1. Important: Disable buffering
@@ -231,6 +231,6 @@ int main()
     //     }
     // }
 
-    divide(&board, 3); 
+    divide(&board, 5);
     return 0;
 }

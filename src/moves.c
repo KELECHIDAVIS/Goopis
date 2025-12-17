@@ -407,72 +407,55 @@ void unmovePiece(Board *board, Move move, enumPiece capturedPiece)
     unsigned int to = getTo(move);
     unsigned int flags = getFlags(move);
 
-    enumPiece side = nWhite;
-    enumPiece oppSide = nBlack;
-    // whichever side was the mover in last state
-    if (board->whiteToMove) // if it's currently white to move that means black went last
-    {
-        side = nBlack;
-        oppSide = nWhite;
-    }
+    // 1. Determine side (Assuming you flipped board->whiteToMove in unmakeMove first)
+    enumPiece side = board->whiteToMove ? nWhite : nBlack;
+    enumPiece oppSide = board->whiteToMove ? nBlack : nWhite;
 
     U64 fromBit = 1ULL << from;
     U64 toBit = 1ULL << to;
 
-    // use mailbox to see which piece was at that spot
-    // ** IF PROMO LAST TURN THIS CONTAINS PROMOTED PIECE
+    // 2. Identify the piece that moved
     enumPiece piece = board->mailbox[to];
 
-    // has to be valid piece
-    assert(piece >= nPawn && piece <= nKing && "The piece could not be found in any bb");
-
-    // move from piece bb
-    board->pieces[piece] &= ~toBit;  // unset to bit
-    board->pieces[piece] |= fromBit; // move back
-
-    // move from side bb
-    board->pieces[side] ^= (fromBit | toBit); // both guarenteed to be set and unset
-
-    // update unmove in mailbox
-    board->mailbox[from] = piece;
-    board->mailbox[to] = nWhite ; //empty  
-
-    // special capture case 
-    //  if en passant place captured piece below to bit
-    if (flags == EN_PASSANT_CAPTURE_FLAG)
+    // VALIDATION
+    if (piece == nWhite)
     {
-        U64 capturePawnPos = 0;
-        int pos = NO_SQUARE;
-        if (side == nWhite)
-        {
-            capturePawnPos = toBit >> 8;
-            pos = (int)to - 8;
-        }
-        else
-        {
-            capturePawnPos = toBit << 8;
-            pos = (int)to + 8;
-        }
-        board->mailbox[pos] = nPawn;              // place empty square where piece used to be
-        board->pieces[nPawn] |= capturePawnPos;   //set bit captured pawn bit on
-        board->pieces[oppSide] |= capturePawnPos; // in the side aswell
-    }else{
-        // standard capture 
-        if (capturedPiece >= nPawn && capturedPiece <= nKing)
-        {
-            // update captured piece's sidebb , piece bb
-            board->pieces[capturedPiece] ^= toBit; // toggle bit
-            board->pieces[oppSide] ^= toBit;       // toggle bit
-        }
+        printf("Error: No piece at 'to' square %d during unmove!\n", to);
+        printChessBoard(board);
+        assert(false);
     }
 
-    // if promo, remove promo piece from dest
+    // 3. Move the piece back geometrically
+    board->pieces[piece] &= ~toBit;
+    board->pieces[piece] |= fromBit;
+    board->pieces[side] ^= (fromBit | toBit);
+
+    board->mailbox[from] = piece;
+    board->mailbox[to] = nWhite; // Start by assuming the 'to' square is now empty
+
+    // 4. Restore Captured Pieces (Crucial Fix)
+    if (flags == EN_PASSANT_CAPTURE_FLAG)
+    {
+        int pos = (side == nWhite) ? (int)to - 8 : (int)to + 8;
+        U64 capturePawnPos = 1ULL << pos;
+
+        board->mailbox[pos] = nPawn;
+        board->pieces[nPawn] |= capturePawnPos;
+        board->pieces[oppSide] |= capturePawnPos;
+    }
+    else if (capturedPiece != nWhite) // Only restore if something was actually captured
+    {
+        board->mailbox[to] = capturedPiece;
+        board->pieces[capturedPiece] |= toBit;
+        board->pieces[oppSide] |= toBit;
+    }
+
+    // 5. Handle Promotions (Move back as a pawn)
     if (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG)
     {
-        // remove promo piece from from square
         board->pieces[piece] &= ~fromBit;
-        board->pieces[nPawn] |= fromBit; // place pawn back
-        board->mailbox[from] = nPawn;    // update mailbox
+        board->pieces[nPawn] |= fromBit;
+        board->mailbox[from] = nPawn;
     }
 
     // if castling place rook back where it came (king alr moved back)
@@ -499,18 +482,23 @@ void unmovePiece(Board *board, Move move, enumPiece capturedPiece)
 }
 void unmakeMove(Board *board, Move move)
 {
-    // retrieve previous state from history stack
+    // 1. Flip the turn BACK first.
+    // If it was Black's turn to move next, flipping it back makes it White's turn (the mover).
+    board->whiteToMove = !board->whiteToMove;
+
+    // 2. Retrieve history
     board->historyPly--;
     MoveHistory *lastState = &board->historyArr[board->historyPly];
 
+    // 3. Now unmove the piece.
+    // Inside unmovePiece, 'side' should now be board->whiteToMove.
     unmovePiece(board, move, lastState->capturedPiece);
 
-    // reinstate board state variables
+    // 4. Reinstate state variables
     board->castlingRights = lastState->castlingRights;
     board->enPassantSquare = lastState->enPassantSquare;
     board->halfmoveClock = lastState->halfmoveClock;
     board->fullmoveNumber = lastState->fullMoveNumber;
-    board->whiteToMove = !board->whiteToMove;
 }
 void getSquareName(unsigned int sq, char *buf)
 {
