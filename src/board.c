@@ -338,6 +338,9 @@ void initBoard(Board *board, char *fen)
     readFullMoveClockFromFen(board, curr);
 
     initMailbox(board) ; 
+
+    // init the history to 0 
+    board->historyPly = 0; 
 }
 
 void initStandardChess(Board* board){

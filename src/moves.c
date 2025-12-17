@@ -108,6 +108,7 @@ void getQueenMoves(const Board *board, Move *moveList, size_t *numMoves)
         extractMovesFromBB(moveList, numMoves, attackPattern & opponentPieces, fromSquare, CAPTURE_FLAG);
     }
 }
+//TODO: add castling for kings moves 
 void getKingMoves(const Board *board, Move *moveList, size_t *numMoves)
 {
     enumPiece side = board->whiteToMove ? nWhite : nBlack;
