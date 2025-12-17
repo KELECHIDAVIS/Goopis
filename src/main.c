@@ -185,7 +185,7 @@ void parseGo(Board *board, char *line)
 
 int main()
 {
-    // char line[INPUT_BUFFER];
+    char line[INPUT_BUFFER];
     Board board;
 
     // 1. Important: Disable buffering
@@ -195,42 +195,42 @@ int main()
     initStandardChess(&board);
     precomputeAllAttacks();
 
-    // // 2. UCI Loop
-    // while (fgets(line, INPUT_BUFFER, stdin))
-    // {
-    //     // Strip newline
-    //     line[strcspn(line, "\n")] = 0;
+    // 2. UCI Loop
+    while (fgets(line, INPUT_BUFFER, stdin))
+    {
+        // Strip newline
+        line[strcspn(line, "\n")] = 0;
 
-    //     if (strcmp(line, "uci") == 0)
-    //     {
-    //         printf("id name DebugEngine\n");
-    //         printf("id author You\n");
-    //         printf("uciok\n");
-    //     }
-    //     else if (strcmp(line, "isready") == 0)
-    //     {
-    //         printf("readyok\n");
-    //     }
-    //     else if (strncmp(line, "position", 8) == 0)
-    //     {
-    //         parsePosition(&board, line);
-    //     }
-    //     else if (strncmp(line, "go", 2) == 0)
-    //     {
-    //         parseGo(&board, line);
-    //     }
-    //     else if (strcmp(line, "quit") == 0)
-    //     {
-    //         break;
-    //     }
-    //     else if (strcmp(line, "d") == 0)
-    //     {
-    //         // Custom command: type "d" in console to see board
-    //         printChessBoard(&board);
-    //         printBoardDetails(&board);
-    //     }
-    // }
+        if (strcmp(line, "uci") == 0)
+        {
+            printf("id name Pufferfish\n");
+            printf("id author Kelechi Duru \n");
+            printf("uciok\n");
+        }
+        else if (strcmp(line, "isready") == 0)
+        {
+            printf("readyok\n");
+        }
+        else if (strncmp(line, "position", 8) == 0)
+        {
+            parsePosition(&board, line);
+        }
+        else if (strncmp(line, "go", 2) == 0)
+        {
+            parseGo(&board, line);
+        }
+        else if (strcmp(line, "quit") == 0)
+        {
+            break;
+        }
+        else if (strcmp(line, "d") == 0)
+        {
+            // Custom command: type "d" in console to see board
+            printChessBoard(&board);
+            printBoardDetails(&board);
+        }
+    }
 
-    divide(&board, 5);
+    
     return 0;
 }
