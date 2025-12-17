@@ -344,8 +344,10 @@ U64 getSideAttackPattern(const Board *board, enumPiece side)
                 result |= getRookAttackPattern(square, blockers);
                 break;
             case nQueen:
-                blockers &= (BishopMagicTable[square].mask | RookMagicTable[square].mask);
-                result |= getQueenAttackPattern(square, blockers);
+                blockers &= BishopMagicTable[square].mask;
+                result |= getBishopAttackPattern(square, blockers);
+                blockers = getAllPieces(board) & RookMagicTable[square].mask; // refresh blockers 
+                result |= getRookAttackPattern(square, blockers);
                 break;
             case nKing:
                 result |= getKingAttackPattern(square);

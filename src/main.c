@@ -11,7 +11,7 @@ int main()
     precomputeAllAttacks(); 
 
     puts("Divide results: "); 
-    U64 totalNodes = divide(&board, 1);
+    U64 totalNodes = divide(&board, 5);
     printf("\nTotal Number of Nodes: %llu\n", totalNodes ) ; 
     return 0;
 }
