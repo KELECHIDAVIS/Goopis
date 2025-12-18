@@ -232,29 +232,29 @@ void movePiece(Board *board, unsigned int from, unsigned int to, MoveFlag flags)
     // has to be valid piece
     assert(piece >= nPawn && piece <= nKing && "The piece could not be found in any bb");
     // move from piece bb
-    // TODO: Remove ALL DEBUG PRINT STATEMENTS : 
-    puts("Pieces Board Before Manipulation"); 
-    printBB(board->pieces[piece ]); 
+    
     board->pieces[piece] ^= fromBit; // guarenteed to be set so just xor it
     
-    puts("Pieces Board Turning of from bit");
-    printBB(board->pieces[piece]);
     board->pieces[piece] |= toBit;   // might be set or not if it's a capture of the same pc
-    
-    puts("Pieces Board Turning on to bit");
-    printBB(board->pieces[piece]);
     
     // move from side bb
     board->pieces[side] ^= (fromBit | toBit); // both guarenteed to be set and unset
+    
+
     // update moving piece in mailbox
     board->mailbox[from] = nWhite; // no piece
     board->mailbox[to] = piece;
 
     if (capturedPiece >= nPawn && capturedPiece <= nKing)
     {
+        //if a piece type has been captured by the same type of a piece, this turns off the capturing piece's position 
+         
         // update captured piece's sidebb , piece bb
-        board->pieces[capturedPiece] ^= toBit;
-        board->pieces[oppSide] ^= toBit;
+        // only turn off if they're not the same piece type bc that would turn off the capturing piece 
+        if (capturedPiece != piece)
+            board->pieces[capturedPiece] ^= toBit;
+
+        board->pieces[oppSide] ^= toBit; // this fine 
 
         // if a capture was a rook have to update castling rights
         if (capturedPiece == nRook)
@@ -381,7 +381,6 @@ void makeMove(Board *board, Move move)
     enumPiece piece = board->mailbox[from];
 
     // save the state for this move
-    printChessBoard(board); 
     saveBoardState(board, move);
     if (piece == nRook || piece == nKing)
         updateCastlingRights(board, piece, from);
