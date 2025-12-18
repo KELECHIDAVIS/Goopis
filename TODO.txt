@@ -1,4 +1,4 @@
 todo: 
 -perft:
-	- the plan is to download a gui debugging tool (arena chess) to see exactly what my engine in thinking. 
-	- to do so, I have to make a uci interface.
+	-there is a bug with en passant capture:
+		- review the move code very carefully and figure out why it's it giving a different output. 

@@ -376,6 +376,7 @@ void makeMove(Board *board, Move move)
 
     // reset en passant square
     board->enPassantSquare = NO_SQUARE; // not valid ep square
+    
     if (flags == DOUBLE_PAWN_PUSH_FLAG)
     { // set ep square to behind/above the pawn
         int capturedPawnPos = (int)to;
