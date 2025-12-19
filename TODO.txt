@@ -1,4 +1,8 @@
 todo: 
 -perft:
 	- when doing go perft 6 on kiwi pete, the program crashes before printing out any moves, probably first move at that depth causes crash within enpassant saveBoardState 
-	
+		-after move a2a3 the empty en passant assertion triggers. 
+		- there should be an enpassant ready after a2a3 anyways **
+		-there is a phantom en passant square on c6 for some reason maybe one of the enpassant checks is corrupting the position or it's not being reset right in the make and unmake move*** 
+
+		**Look at the history Arr in the debugger with each move up to the point of the assertion and replay those specific moves in the cli to track down what is happening in that branch that leads to a phantom enpassant square on c6 ()

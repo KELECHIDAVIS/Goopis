@@ -352,7 +352,11 @@ void saveBoardState(Board *board, Move move)
     board->historyArr[board->historyPly].halfmoveClock = board->halfmoveClock;
     board->historyArr[board->historyPly].fullMoveNumber = board->fullmoveNumber;
     unsigned int to = getTo(move);
-    if (getFlags(move) == EN_PASSANT_CAPTURE_FLAG)
+    unsigned int from = getFrom (move); 
+    unsigned int flags = getFlags(move); 
+
+    (void) from ; 
+    if (flags == EN_PASSANT_CAPTURE_FLAG)
     {
         // depending on the side, the captured pawn is above or below
         int capturedPawnPos = (int)to;
