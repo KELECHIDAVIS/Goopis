@@ -288,6 +288,25 @@ int main()
         puts("Current Board State: ");  
         printBoardDetails(&board); 
         
+        // print out all pseudo legal moves in this postion 
+        Move moveList[MAX_MOVES];
+        size_t numMoves = 0; 
+        getPseudoLegalMoves(&board, moveList, &numMoves);
+        
+        puts("Legal moves: "); 
+        for(size_t j= 0; j< numMoves ; j++){
+            Move move = moveList[j];
+            unsigned int from = getFrom(move);
+            unsigned int to = getTo(move);
+            unsigned int flags = getFlags(move);
+            char fromBuff[3];
+            char toBuff[3];
+            char flagBuff[12];
+            translateSquareToAlgebraic(from, fromBuff);
+            translateSquareToAlgebraic(to, toBuff);
+            translateFlagToAlgebraic(flags, flagBuff); 
+            printf("%s%s %s,  ", fromBuff, toBuff, flagBuff);   
+        }puts(""); 
         Move move = board.historyArr[i].move ; 
         unsigned int from = getFrom(move); 
         unsigned int to = getTo(move); 
