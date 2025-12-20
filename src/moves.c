@@ -404,16 +404,15 @@ void saveBoardState(Board *board, Move move)
     board->historyArr[board->historyPly].halfmoveClock = board->halfmoveClock;
     board->historyArr[board->historyPly].fullMoveNumber = board->fullmoveNumber;
     unsigned int to = getTo(move);
-    unsigned int from = getFrom (move); 
     unsigned int flags = getFlags(move); 
 
-    (void) from ; 
-    if (flags == EN_PASSANT_CAPTURE_FLAG)
+    if (flags == EN_PASSANT_CAPTURE_FLAG && board->enPassantSquare>=a1 &&board->enPassantSquare <=h8)
     {
         // depending on the side, the captured pawn is above or below
         int capturedPawnPos = (int)to;
         capturedPawnPos += board->whiteToMove ? -8 : 8;
         board->historyArr[board->historyPly].capturedPiece = board->mailbox[capturedPawnPos];
+        
         assert(board->historyArr[board->historyPly].capturedPiece == nPawn && "The Piece That Was Captured During enPassant was not a pawn"); 
     }
     else
