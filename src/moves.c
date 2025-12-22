@@ -96,9 +96,6 @@ void getKnightMoves(const Board *board, Move *moveList, size_t *numMoves) {
         knights = CLEARLSBIT(knights);
         enumSquare fromSquare = __builtin_ctzll(pos);
 
-        if (fromSquare > h8 || fromSquare < a1)
-            continue;
-
         U64 attackPattern = getKnightAttackPattern(fromSquare);
 
         // and with empty to get quiet moves
@@ -419,7 +416,8 @@ void makeMove(Board *board, Move move) {
     // if capturedPiece isValidPiece or if pawn moved : halfmove clock = 0
     if (movingPiece == nPawn || isValidPiece(capturedPiece))
         board->halfmoveClock = 0;
-
+    else 
+        board->halfmoveClock++; 
     // put_piece the moving piece at destination
     putPiece(board, movingPiece, side, to);
 
@@ -429,11 +427,11 @@ void makeMove(Board *board, Move move) {
     else
         board->enPassantSquare = 0;
 
-    // if king or rook moved OR rook was capturedPiece, update castling rights
+    // if king or rook moved OR rook was capturedPiece, update castling righ`ts
     if (movingPiece == nKing || movingPiece == nRook)
         updateCastlingRights(board, movingPiece, from);
     else if (capturedPiece == nRook)
-        updateCastlingRights(board, capturedPiece, to);
+        updateCastlingRights(board, capturedPiece, capturedDest);
 
     // if promo, remove_piece the pawn at dest then place promo piece
     if (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG) {
