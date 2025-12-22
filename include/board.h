@@ -8,8 +8,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdint.h>
-#include <ctype.h> 
-
+#include <ctype.h>
 
 // castling rights
 #define W_K_CASTLE 0b1000
@@ -32,7 +31,7 @@
 #define MAX_SEARCH_DEPTH 256
 typedef unsigned long long U64;
 
-// returns the lsb and cleared lsb 
+// returns the lsb and cleared lsb
 #define LSBIT(X) ((X) & (-(X)))
 #define CLEARLSBIT(X) ((X) & ((X) - 1))
 
@@ -102,7 +101,7 @@ typedef enum
   f8,
   g8,
   h8,
-  NO_SQUARE=64
+  NO_SQUARE = 64
 } enumSquare;
 typedef enum
 {
@@ -128,6 +127,7 @@ typedef struct
   unsigned short halfmoveClock;
   unsigned short fullMoveNumber;
   enumPiece capturedPiece;
+  bool whiteToMove; 
 } MoveHistory;
 
 typedef struct
@@ -150,7 +150,7 @@ static inline U64 getAllPieces(const Board *board)
 }
 static inline U64 getColorPieces(const Board *board, enumPiece color)
 {
-    return board->pieces[color];
+  return board->pieces[color];
 }
 // returns bitboard of all pieces of given type regardless of color
 static inline U64 getPieceTypePieces(const Board *board, enumPiece pieceType)
@@ -162,8 +162,12 @@ static inline U64 getSpecificColorPieces(const Board *board, enumPiece color, en
 {
   return board->pieces[color] & board->pieces[pieceType];
 }
+static inline isValidPiece(enumPiece piece)
+{
+  return (piece >= nPawn && piece <= nKing);
+}
 extern void initBoard(Board *board, char *fen);
-extern void initStandardChess(Board* board); 
+extern void initStandardChess(Board *board);
 extern void addPiece(Board *board, enumPiece color, enumPiece pieceType, enumSquare square);
 extern void printBB(U64 bb);
 extern void printChessBoard(const Board *board);

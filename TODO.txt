@@ -1,3 +1,4 @@
 todo: 
 -perft: 
 	to make the make and umake move functions simpler i am going to redo them from scratch to make sure that everything is taken care of cleanly.
+	** if still having trouble after this, check out movegeneration, might be generating illegal moves 
