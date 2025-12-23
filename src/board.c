@@ -1,35 +1,20 @@
 #include "board.h"
 
-
-
-
-
-
-
-
-
-void addPiece(Board *board, enumPiece color, enumPiece pieceType, enumSquare square)
-{
+void addPiece(Board *board, enumPiece color, enumPiece pieceType, enumSquare square) {
     U64 bit = 1ULL << square;
     board->pieces[color] |= bit;
     board->pieces[pieceType] |= bit;
-    board->mailbox[square] = pieceType  ; 
+    board->mailbox[square] = pieceType;
 }
-void printBB(U64 bb)
-{
-    for (int rank = 7; rank >= 0; rank--)
-    {
+void printBB(U64 bb) {
+    for (int rank = 7; rank >= 0; rank--) {
         printf("%d| ", rank + 1);
-        for (int file = 0; file < 8; file++)
-        {
+        for (int file = 0; file < 8; file++) {
             enumSquare square = rank * 8 + file;
             U64 bit = 1ULL << square;
-            if (bb & bit)
-            {
+            if (bb & bit) {
                 printf("1 ");
-            }
-            else
-            {
+            } else {
                 printf(". ");
             }
         }
@@ -39,20 +24,16 @@ void printBB(U64 bb)
     printf("   a b c d e f g h \n");
 }
 // prints corresponding characters at each spot
-void printChessBoard(const Board *board)
-{
+void printChessBoard(const Board *board) {
     char possible[] = {'p', 'n', 'b', 'r', 'q', 'k'};
     U64 empty = ~getAllPieces(board);
-    for (int rank = 7; rank >= 0; rank--)
-    {
+    for (int rank = 7; rank >= 0; rank--) {
         printf("%d| ", rank + 1);
-        for (int file = 0; file < 8; file++)
-        {
+        for (int file = 0; file < 8; file++) {
             enumSquare square = rank * 8 + file;
             U64 bit = 1ULL << square;
 
-            if (bit & empty)
-            {
+            if (bit & empty) {
                 printf(". ");
                 continue;
             }
@@ -60,16 +41,15 @@ void printChessBoard(const Board *board)
             U64 isWhite = board->pieces[nWhite] & bit;
 
             char c = 'x';
-            for (int i = 2; i < 8; i++)
-            {
-                if (bit & board->pieces[i])
-                {
+            for (int i = 2; i < 8; i++) {
+                if (bit & board->pieces[i]) {
                     c = possible[i - 2];
                     break;
                 }
             }
 
-          //  assert(c != 'x' && "Each character printed should have a relevant value");
+            //TODO: uncomment out after debugging 
+            //  assert(c != 'x' && "Each character printed should have a relevant value");
 
             // white is upper
             c = isWhite != 0 ? (char)toupper(c) : c;
@@ -80,28 +60,42 @@ void printChessBoard(const Board *board)
     }
     printf("   _ _ _ _ _ _ _ _ \n");
     printf("   a b c d e f g h \n");
+
+#ifdef DEBUG
+    puts("White Pieces");
+    printBB(board->pieces[nWhite]);
+    puts("Black Pieces");
+    printBB(board->pieces[nBlack]);
+    puts("Pawns");
+    printBB(board->pieces[nPawn]);
+    puts("Knights");
+    printBB(board->pieces[nKnight]);
+    puts("Bishops");
+    printBB(board->pieces[nBishop]);
+    puts("Rooks");
+    printBB(board->pieces[nRook]);
+    puts("Queens");
+    printBB(board->pieces[nQueen]);
+    puts("Kings");
+    printBB(board->pieces[nKing]);
+#endif
 }
-void getFEN(Board *board, char *fen)
-{
+void getFEN(Board *board, char *fen) {
     int pos = 0;
 
     // 1. Piece placement
-    for (int rank = 7; rank >= 0; rank--)
-    {
+    for (int rank = 7; rank >= 0; rank--) {
         int emptySquares = 0;
-        for (int file = 0; file < 8; file++)
-        {
+        for (int file = 0; file < 8; file++) {
             enumSquare square = rank * 8 + file;
             U64 bit = 1ULL << square;
 
             // Check if there's a piece here
             U64 allPieces = getAllPieces(board);
 
-            if (bit & allPieces)
-            {
+            if (bit & allPieces) {
                 // If we found a piece, first write any accumulated empty squares
-                if (emptySquares > 0)
-                {
+                if (emptySquares > 0) {
                     fen[pos++] = (char)emptySquares + '0';
                     emptySquares = 0;
                 }
@@ -109,25 +103,21 @@ void getFEN(Board *board, char *fen)
                 // Determine piece type and color
                 char c = 'x';
                 char possible[] = {'p', 'n', 'b', 'r', 'q', 'k'};
-                for (int i = nPawn; i <=nKing; i++)
-                {
-                    if (bit & board->pieces[i])
-                    {
+                for (int i = nPawn; i <= nKing; i++) {
+                    if (bit & board->pieces[i]) {
                         c = possible[i - 2];
                         break;
                     }
                 }
                 if (bit & board->pieces[nWhite])
-                    c = (char) toupper(c);
+                    c = (char)toupper(c);
                 fen[pos++] = c;
-            }
-            else
-            {
+            } else {
                 emptySquares++;
             }
         }
         if (emptySquares > 0)
-            fen[pos++] = (char) emptySquares + '0';
+            fen[pos++] = (char)emptySquares + '0';
         if (rank > 0)
             fen[pos++] = '/';
     }
@@ -154,35 +144,31 @@ void getFEN(Board *board, char *fen)
     fen[pos++] = ' ';
     // Note: To match Stockfish exactly, you'd only print this
     // if a capture is possible, but here we print the stored square.
-    if (board->enPassantSquare >= a1 && board->enPassantSquare <= h8)
-    {
-        // if a current side pawn can capture the ep square then we should print it 
-        if (board->whiteToMove){
-            U64 pawnPos = board->enPassantSquare >> 9 | board->enPassantSquare>> 7; 
-            if (pawnPos & getSpecificColorPieces(board, nWhite, nPawn)){
+    if (board->enPassantSquare >= a1 && board->enPassantSquare <= h8) {
+        // if a current side pawn can capture the ep square then we should print it
+        if (board->whiteToMove) {
+            U64 pawnPos = board->enPassantSquare >> 9 | board->enPassantSquare >> 7;
+            if (pawnPos & getSpecificColorPieces(board, nWhite, nPawn)) {
                 char sqBuf[3];
                 translateSquareToAlgebraic(board->enPassantSquare, sqBuf);
                 fen[pos++] = sqBuf[0];
                 fen[pos++] = sqBuf[1];
-            }else{
+            } else {
                 fen[pos++] = '-';
             }
-        }else{
+        } else {
             U64 pawnPos = board->enPassantSquare << 9 | board->enPassantSquare << 7;
-            if (pawnPos & getSpecificColorPieces(board, nBlack, nPawn))
-            {
+            if (pawnPos & getSpecificColorPieces(board, nBlack, nPawn)) {
                 char sqBuf[3];
                 translateSquareToAlgebraic(board->enPassantSquare, sqBuf);
                 fen[pos++] = sqBuf[0];
                 fen[pos++] = sqBuf[1];
-            }else{
+            } else {
                 fen[pos++] = '-';
             }
         }
-        
-    }
-    else
-    {
+
+    } else {
         fen[pos++] = '-';
     }
 
@@ -194,8 +180,7 @@ void getFEN(Board *board, char *fen)
 
     fen[pos] = '\0';
 }
-void printBoardDetails(Board *board)
-{
+void printBoardDetails(Board *board) {
     printChessBoard(board);
 
     char fenBuffer[128];
@@ -203,8 +188,7 @@ void printBoardDetails(Board *board)
 
     printf("Fen: %s\n", fenBuffer);
 }
-void translateSquareToAlgebraic(enumSquare square, char *buffer)
-{
+void translateSquareToAlgebraic(enumSquare square, char *buffer) {
     int file = square % 8;
     int rank = (int)square / 8;
 
@@ -212,37 +196,29 @@ void translateSquareToAlgebraic(enumSquare square, char *buffer)
     buffer[1] = (char)('1' + rank);
     buffer[2] = '\0';
 }
-char *readPiecesFromFen(Board *board, char *fen)
-{
+char *readPiecesFromFen(Board *board, char *fen) {
     // initialize all bbs to 0
-    for (int i = 0; i < 8; ++i)
-    {
+    for (int i = 0; i < 8; ++i) {
         board->pieces[i] = 0;
     }
 
     int rank = 7;
     int file = 0;
 
-    while (*fen != ' ')
-    {
+    while (*fen != ' ') {
         char c = *fen;
 
-        if (c == '/')
-        {
+        if (c == '/') {
             rank--;
             file = 0;
-        }
-        else if (isalpha(c))
-        {
-            if (!(file < 8 && file >= 0 && rank >= 0 && rank < 8))
-            {
+        } else if (isalpha(c)) {
+            if (!(file < 8 && file >= 0 && rank >= 0 && rank < 8)) {
                 printf("Error with out of bounds in FEN parsing should be between [0-7]: file %d rank %d\n", file, rank);
                 abort();
             }
             enumPiece pieceType;
             enumPiece color;
-            switch (tolower(c))
-            {
+            switch (tolower(c)) {
             case 'p':
                 pieceType = nPawn;
                 break;
@@ -265,12 +241,9 @@ char *readPiecesFromFen(Board *board, char *fen)
                 printf("Error parsing FEN: invalid piece char %c\n", c);
                 abort();
             }
-            if (isupper(c))
-            {
+            if (isupper(c)) {
                 color = nWhite;
-            }
-            else
-            {
+            } else {
                 color = nBlack;
             }
             enumSquare square = (rank * 8 + file);
@@ -278,9 +251,7 @@ char *readPiecesFromFen(Board *board, char *fen)
             addPiece(board, color, pieceType, square);
 
             file++;
-        }
-        else if (isdigit(c))
-        {
+        } else if (isdigit(c)) {
             int emptySquares = c - '0';
             file += emptySquares;
         }
@@ -291,27 +262,22 @@ char *readPiecesFromFen(Board *board, char *fen)
     return fen;
 }
 
-char *readSideToMoveFromFen(Board *board, char *fen)
-{
+char *readSideToMoveFromFen(Board *board, char *fen) {
     board->whiteToMove = tolower(*fen) == 'w';
     fen += 2;
     return fen;
 }
-char *readFromCastlingRights(Board *board, char *fen)
-{
+char *readFromCastlingRights(Board *board, char *fen) {
     board->castlingRights = 0; // make sure it's initialized
 
-    if (*fen == '-')
-    {
+    if (*fen == '-') {
         fen += 2;
         return fen;
     }
 
-    while (*fen != ' ')
-    {
+    while (*fen != ' ') {
         char c = *fen;
-        switch (c)
-        {
+        switch (c) {
         case 'K':
             board->castlingRights |= W_K_CASTLE;
             break;
@@ -335,20 +301,17 @@ char *readFromCastlingRights(Board *board, char *fen)
 
     return fen;
 }
-char *readEnPassantFromFen(Board *board, char *fen)
-{
-    board->enPassantSquare = NO_SQUARE; // make invalid square 
+char *readEnPassantFromFen(Board *board, char *fen) {
+    board->enPassantSquare = NO_SQUARE; // make invalid square
 
-    if (*fen == '-')
-    {
+    if (*fen == '-') {
         fen += 2;
         return fen;
     }
 
     // first char should be a letter
     char file = *fen;
-    if (!isalpha(file))
-    {
+    if (!isalpha(file)) {
         puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)");
         abort();
     }
@@ -357,8 +320,7 @@ char *readEnPassantFromFen(Board *board, char *fen)
 
     fen++;
     char rank = *fen;
-    if (!isdigit(rank))
-    {
+    if (!isdigit(rank)) {
         puts("Have to put enpassant in this format: a3 , E8, - (if no en passant)");
         abort();
     }
@@ -370,62 +332,53 @@ char *readEnPassantFromFen(Board *board, char *fen)
     fen += 2;
     return fen;
 }
-char *readHalfMoveClockFromFen(Board *board, char *fen)
-{
+char *readHalfMoveClockFromFen(Board *board, char *fen) {
     char c = *fen;
 
-    board->halfmoveClock = 0; 
+    board->halfmoveClock = 0;
 
-    if (!isdigit(c))
-    {
-        return ""; 
+    if (!isdigit(c)) {
+        return "";
     }
 
     board->halfmoveClock = (unsigned short)atoi(fen); // get the first number string
 
     // could be a variable amount of digits
-    while (*fen != ' ')
-    {
+    while (*fen != ' ') {
         fen++;
     }
     fen++;
 
     return fen;
 }
-void readFullMoveClockFromFen(Board *board, char *fen)
-{
+void readFullMoveClockFromFen(Board *board, char *fen) {
     char c = *fen;
 
-    board->fullmoveNumber = 1; 
-    if (!isdigit(c))
-    {
-        return ; 
+    board->fullmoveNumber = 1;
+    if (!isdigit(c)) {
+        return;
     }
 
     board->fullmoveNumber = (unsigned short)atoi(fen); // get first number string
 
     // dnt increment to avoid undefined behavior
 }
-static void initMailbox ( Board * board){
-    for (int sq = 0; sq < 64; sq++)
-    {
+static void initMailbox(Board *board) {
+    for (int sq = 0; sq < 64; sq++) {
         board->mailbox[sq] = nWhite; // if it doesn't hold a valid piece type it's empty
     }
-    for (enumPiece piece = nPawn; piece <= nKing; piece++)
-    {
+    for (enumPiece piece = nPawn; piece <= nKing; piece++) {
         U64 bb = board->pieces[piece];
-        while (bb)
-        {
+        while (bb) {
             int sq = __builtin_ctzll(bb);
             board->mailbox[sq] = piece;
             bb &= bb - 1;
         }
     }
 }
-//TODO: make sure that enpassant squares are printed correctly 
-void initBoard(Board *board, char *fen)
-{
-    
+// TODO: make sure that enpassant squares are printed correctly
+void initBoard(Board *board, char *fen) {
+
     char *curr = fen; // copy fen
 
     // now at side to move
@@ -452,13 +405,13 @@ void initBoard(Board *board, char *fen)
 
     readFullMoveClockFromFen(board, curr);
 
-    initMailbox(board) ; 
+    initMailbox(board);
 
-    // init the history to 0 
-    board->historyPly = 0; 
+    // init the history to 0
+    board->historyPly = 0;
 }
 
-void initStandardChess(Board* board){
+void initStandardChess(Board *board) {
     char *fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    initBoard(board, fen); 
-} 
+    initBoard(board, fen);
+}

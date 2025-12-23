@@ -110,7 +110,7 @@ typedef enum {
     nRook,
     nQueen,
     nKing,
-    nSize, // amount of enums
+    EMPTY, // amount of enums
 } enumPiece;
 
 // forward declaring Move,  which is defined in move.h
@@ -162,7 +162,7 @@ static inline void removePiece(Board *board, enumPiece piece, enumPiece side,
     U64 posBit = 1ULL << pos;
     board->pieces[piece] &= ~posBit;
     board->pieces[side] &= ~posBit;
-    board->mailbox[pos] = nWhite; // empty
+    board->mailbox[pos] = EMPTY; // empty
 }
 static inline void putPiece(Board *board, enumPiece piece, enumPiece side,
                             unsigned int dest) {

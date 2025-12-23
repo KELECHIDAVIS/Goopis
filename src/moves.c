@@ -396,7 +396,8 @@ void makeMove(Board *board, Move move) {
     saveBoardState(board, move, capturedPiece);
     
     // remove captured Piece from dest and moving Piece from start
-    removePiece(board, capturedPiece, opp, capturedDest);
+    if (isValidPiece(capturedPiece))
+        removePiece(board, capturedPiece, opp, capturedDest);
     removePiece(board, movingPiece, side, from);
 
 
@@ -536,7 +537,8 @@ void unmakeMove(Board *board, Move move) {
 
     removePiece(board, movingPiece, side, to); // remove moving piece from destination
     putPiece(board, movingPiece, side, from);  // place movingPiece at start; captured at dest 
-    putPiece(board, capturedPiece, opp, capturedDest); // if empty nothing will be placed
+    if(isValidPiece(capturedPiece))
+        putPiece(board, capturedPiece, opp, capturedDest); // if empty nothing will be placed
     
     // load last board state , decrement size then load state (whiteToMove (changed at start
     // of function), castlingRights, enPassantSquare, halfMoveClock,
