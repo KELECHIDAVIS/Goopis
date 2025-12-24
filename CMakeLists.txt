@@ -14,6 +14,8 @@ add_library(engine_lib STATIC
     src/moves.c
     src/perft.c
     src/attack_patterns.c
+    src/eval.c
+    src/search.c
 )
 
 target_include_directories(engine_lib PUBLIC 
