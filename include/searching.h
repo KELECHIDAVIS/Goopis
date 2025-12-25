@@ -3,6 +3,6 @@
 #include "eval.h"
 #include "moves.h"
 #include <float.h>
-extern double negamax(Board* board, int depth ); 
+extern double alphaBeta(Board* board, int depth , double alpha , double beta); 
 
 #endif //  SEARCH_H

@@ -15,7 +15,7 @@ add_library(engine_lib STATIC
     src/perft.c
     src/attack_patterns.c
     src/eval.c
-    src/search.c
+    src/searching.c
 )
 
 target_include_directories(engine_lib PUBLIC 
