@@ -13,18 +13,26 @@ double alphaBeta(Board *board, int depth, double alpha, double beta) {
     enumPiece currSide = board->whiteToMove ? nWhite : nBlack;
 
     for (size_t i = 0; i < numMoves; i++) {
+       
         makeMove(board, move_list[i]);
+
         if (!isSideInCheck(board, currSide)) { // legal move
+            
             double score = -alphaBeta(board, depth - 1, -beta , -alpha);
+            
+            unmakeMove(board, move_list[i]); // unmake move before returning 
             
             if(score>= beta)
                 return beta; // opponent wouldn't allow move so return 
+
             if(score > alpha){
                 alpha = score;
                 board->bestMove = move_list[i]; 
             } 
+        }else{ // unmake illegal move 
+            unmakeMove(board, move_list[i]);
         }
-        unmakeMove(board, move_list[i]);
+        
     }
     return alpha; 
 }
