@@ -20,13 +20,10 @@ RUN mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release && \
     make
 
+
 # 6. Install Python dependencies
-# We now specify the path to the requirements file
 RUN pip install --no-cache-dir -r lichess-bot-master/requirements.txt
 
-# 7. Start the bot from the correct directory
-# Move WORKDIR into the bot folder so it can find 'lib/versioning.yml'
-WORKDIR /app/lichess-bot-master
-
-# Run the script. Note that config.yml is now one level UP (../config.yml)
-CMD ["python", "-u", "lichess-bot.py", "--config", "../config.yml"]
+# 7. Start the bot (The Fix)
+# We use /bin/sh to ensure we enter the directory before the python process starts
+CMD cd /app/lichess-bot-master && python -u lichess-bot.py --config ../config.yml
