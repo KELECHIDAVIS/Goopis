@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(Pufferfish VERSION 1.0 LANGUAGES C CXX)
+project(Goopis VERSION 1.0 LANGUAGES C CXX)
 
 enable_testing()
 
@@ -29,12 +29,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # 2. Define the Executable
-add_executable(pufferfish src/main.c)
-target_link_libraries(pufferfish PRIVATE engine_lib)
+add_executable(goopis src/main.c)
+target_link_libraries(goopis PRIVATE engine_lib)
 
 # Also enable DEBUG for the executable in Debug builds
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(pufferfish PRIVATE DEBUG)
+    target_compile_definitions(goopis PRIVATE DEBUG)
 endif()
 
 # 3. Setup GoogleTest
