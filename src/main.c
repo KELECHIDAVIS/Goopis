@@ -1,21 +1,21 @@
 // main.c
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
+#include "attack_patterns.h"
 #include "board.h"
 #include "moves.h"
-#include "attack_patterns.h"
 #include "perft.h"
 #include "searching.h"
+
 #include <time.h>
 
 #define INPUT_BUFFER 4096
 
 // --- Helper: Convert UCI string (e.g., "e2e4", "a7a8q") to your internal Move ---
-Move parseMove(Board *board, char *moveStr)
-{
+Move parseMove(Board *board, char *moveStr) {
     // 1. Parse source and destination from string
     int fromFile = moveStr[0] - 'a';
     int fromRank = moveStr[1] - '1';
@@ -31,23 +31,19 @@ Move parseMove(Board *board, char *moveStr)
     getPseudoLegalMoves(board, moveList, &numMoves);
 
     // 3. Find the matching move in the list
-    for (size_t i = 0; i < numMoves; i++)
-    {
+    for (size_t i = 0; i < numMoves; i++) {
         Move m = moveList[i];
 
         // Check if coordinates match
-        if (getFrom(m) == from && getTo(m) == to)
-        {
+        if (getFrom(m) == from && getTo(m) == to) {
             // Check for promotion (if the string has a 5th char like 'q')
             unsigned int flags = getFlags(m);
             bool isPromo = (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG);
 
-            if (isPromo)
-            {
+            if (isPromo) {
                 // If UCI string has no promo char but move is promo, skip (wrong move)
                 // If UCI string has promo char, we must match the piece type
-                if (strlen(moveStr) > 4)
-                {
+                if (strlen(moveStr) > 4) {
                     // char promoChar = moveStr[4];
                     //  Map flag to char to compare
                     //  (Simplified check: assuming 'q' is most common, or check your flag logic)
@@ -56,9 +52,7 @@ Move parseMove(Board *board, char *moveStr)
                     //  or simply return the first match if you don't support underpromotions yet.
                     return m;
                 }
-            }
-            else
-            {
+            } else {
                 // Not a promotion move, and string has no promo char -> MATCH
                 return m;
             }
@@ -68,47 +62,37 @@ Move parseMove(Board *board, char *moveStr)
 }
 
 // --- Helper: Handle "position" command from GUI ---
-void parsePosition(Board *board, char *line)
-{
+void parsePosition(Board *board, char *line) {
     // line looks like: "position startpos moves e2e4 e7e5"
     // or: "position fen rnbqk... moves e2e4"
 
     char *ptr = line + 9; // Skip "position "
 
-    if (strncmp(ptr, "startpos", 8) == 0)
-    {
+    if (strncmp(ptr, "startpos", 8) == 0) {
         initStandardChess(board);
         ptr += 8;
-    }
-    else if (strncmp(ptr, "fen", 3) == 0)
-    {
+    } else if (strncmp(ptr, "fen", 3) == 0) {
         ptr += 4;              // Skip "fen "
         initBoard(board, ptr); // Your initBoard handles the FEN string
         // We need to advance ptr past the FEN string to get to "moves"
         // FENs end when " moves" starts.
         char *movesCmd = strstr(line, "moves");
-        if (movesCmd)
-        {
+        if (movesCmd) {
             ptr = movesCmd;
-        }
-        else
-        {
+        } else {
             return; // No moves to apply
         }
     }
 
     // Apply moves if present
     ptr = strstr(line, "moves");
-    if (ptr)
-    {
+    if (ptr) {
         ptr += 6; // Skip "moves "
-        while (*ptr)
-        {
+        while (*ptr) {
             // Extract the next move string (e.g., "e2e4")
             char moveStr[6];
             int i = 0;
-            while (*ptr && *ptr != ' ' && *ptr != '\n' && i < 5)
-            {
+            while (*ptr && *ptr != ' ' && *ptr != '\n' && i < 5) {
                 moveStr[i++] = *ptr++;
             }
             moveStr[i] = '\0';
@@ -117,11 +101,9 @@ void parsePosition(Board *board, char *line)
             while (*ptr == ' ')
                 ptr++;
 
-            if (strlen(moveStr) > 0)
-            {
+            if (strlen(moveStr) > 0) {
                 Move m = parseMove(board, moveStr);
-                if (m != 0)
-                {
+                if (m != 0) {
                     makeMove(board, m);
                 }
             }
@@ -132,17 +114,14 @@ void parsePosition(Board *board, char *line)
 }
 
 // --- Helper: Parse "go perft <depth>" ---
-void parseGo(Board *board, char *line)
-{
+void parseGo(Board *board, char *line) {
     // "go perft 5" or just "go" (Arena might send just "go" for a game)
     // For debugging, we can implement a custom perft trigger.
 
-    if (strstr(line, "perft"))
-    {
+    if (strstr(line, "perft")) {
         int depth = 3; // default
         char *ptr = strstr(line, "perft");
-        if (ptr)
-        {
+        if (ptr) {
             depth = atoi(ptr + 6);
         }
 
@@ -153,8 +132,7 @@ void parseGo(Board *board, char *line)
         double seconds = ((double)t) / CLOCKS_PER_SEC;
         U64 nodesPerSecond = (U64)((double)nodes / seconds);
         printf("Nodes Per Second: %llu\n", nodesPerSecond);
-    }
-    else // ex: go 4, return the best move searching a depth of 4
+    } else // ex: go 4, return the best move searching a depth of 4
     {
 
         int depth = -1;
@@ -169,23 +147,29 @@ void parseGo(Board *board, char *line)
         // 2. Parse "wtime", "btime", "movetime", "depth"
         char *ptr = NULL;
 
-        if ((ptr = strstr(line, "wtime"))) wtime = atoi(ptr + 6);
-        if ((ptr = strstr(line, "btime"))) btime = atoi(ptr + 6);
-        if ((ptr = strstr(line, "movetime"))) movetime = atoi(ptr + 9);
-        if ((ptr = strstr(line, "depth"))) depth = atoi(ptr + 6);
+        if ((ptr = strstr(line, "wtime")))
+            wtime = atoi(ptr + 6);
+        if ((ptr = strstr(line, "btime")))
+            btime = atoi(ptr + 6);
+        if ((ptr = strstr(line, "movetime")))
+            movetime = atoi(ptr + 9);
+        if ((ptr = strstr(line, "depth")))
+            depth = atoi(ptr + 6);
 
         // 3. Determine Search Mode
         // Ideally implement time management here.
         // Example: int timeToThink = (board->sideToMove == WHITE) ? wtime / 30 : btime / 30;
-        
+
         // For now, since your engine seems to rely on fixed depth:
         if (depth == -1) {
             // If Lichess didn't specify a depth (it usually provides time instead),
-           
+
             if (wtime > 0 && btime > 0) {
-                
-                if (wtime > 60000 && btime > 60000) depth = 6;
-                else depth = 5;
+
+                if (wtime > 60000 && btime > 60000)
+                    depth = 6;
+                else
+                    depth = 5;
             } else {
                 depth = 5; // Fallback default
             }
@@ -205,8 +189,7 @@ void parseGo(Board *board, char *line)
     }
 }
 
-int main()
-{
+int main() {
     char line[INPUT_BUFFER];
     Board board;
 
@@ -216,42 +199,29 @@ int main()
 
     initStandardChess(&board);
     precomputeAllAttacks();
+    init_pesto_tables();
 
     // 2. UCI Loop
-    while (fgets(line, INPUT_BUFFER, stdin))
-    {
+    while (fgets(line, INPUT_BUFFER, stdin)) {
         // Strip newline
         line[strcspn(line, "\n")] = 0;
 
-        if (strcmp(line, "uci") == 0)
-        {
+        if (strcmp(line, "uci") == 0) {
             printf("id name Goopis\n");
             printf("id author Kelechi Duru \n");
             printf("uciok\n");
-        }
-        else if (strcmp(line, "isready") == 0)
-        {
+        } else if (strcmp(line, "isready") == 0) {
             printf("readyok\n");
-        }
-        else if (strncmp(line, "position", 8) == 0)
-        {
+        } else if (strncmp(line, "position", 8) == 0) {
             parsePosition(&board, line);
-        }
-        else if (strncmp(line, "go", 2) == 0)
-        {
+        } else if (strncmp(line, "go", 2) == 0) {
             parseGo(&board, line);
-        }
-        else if (strcmp(line, "quit") == 0)
-        {
+        } else if (strcmp(line, "quit") == 0) {
             break;
-        }
-        else if (strcmp(line, "d") == 0)
-        {
+        } else if (strcmp(line, "d") == 0) {
             printBoardDetails(&board);
         }
     }
-
- 
 
     return 0;
 }

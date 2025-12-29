@@ -810,7 +810,7 @@ int mg_table[12][64];
 int eg_table[12][64];
 
 // run at beginning of the program
-void init_tables() {
+void init_pesto_tables() {
     int pc, p, sq;
     for (p = PAWN, pc = WHITE_PAWN; p <= KING; pc += 2, p++) {
         for (sq = 0; sq < 64; sq++) {
