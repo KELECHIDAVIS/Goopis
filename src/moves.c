@@ -20,9 +20,14 @@ void getPseudoLegalMoves(const Board *board, Move *moveList, size_t *numMoves) {
     getQueenMoves(board, moveList, numMoves);
     getKingMoves(board, moveList, numMoves);
 
-    // TODO: sort moves based on viability to improve alpha beta 
+    
 }
 
+// TODO: sort moves based on viability to improve alpha beta
+
+void sortMoveList (Move* moveList , size_t numMoves){
+
+}
 void getPawnMoves(const Board *board, Move *moveList, size_t *numMoves) {
     enumPiece side = board->whiteToMove ? nWhite : nBlack;
     U64 pawns = getSpecificColorPieces(board, side, nPawn);

@@ -5,6 +5,9 @@
 
 // for the simple eval function: 
 
-extern double evaluate(const Board* board); 
+extern int evaluate(const Board* board); 
+
+extern void init_table(); 
+
 
 #endif // EVAL_H
