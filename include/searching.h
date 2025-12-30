@@ -11,7 +11,7 @@
 #define MATE_SCORE 100000
 
 typedef struct {
-    clock_t startTime;
+    time_t startTime;
     int allocatedTime; // in milliseconds
     bool timeUp;
 } SearchInfo;

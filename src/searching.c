@@ -1,16 +1,21 @@
 #include "searching.h"
+#include <sys/time.h>
 
 SearchInfo searchInfo;
 
 void initSearch(int timeMs) {
-    searchInfo.startTime = clock();
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    searchInfo.startTime = tv.tv_sec * 1000 + tv.tv_usec / 1000; // Convert to ms
     searchInfo.allocatedTime = timeMs;
     searchInfo.timeUp = false;
 }
 
 int getElapsedTime() {
-    clock_t current = clock();
-    return (int)(((double)(current - searchInfo.startTime) / CLOCKS_PER_SEC) * 1000);
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    long long current = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    return (int)(current - searchInfo.startTime);
 }
 
 bool shouldStop() {
@@ -101,7 +106,10 @@ Move getBestMove(Board *board, int maxTimeMs) {
     double bestScore = -INFINITY;
 
     // Initialize search with allocated time
+    nodeCount =0 ; // reset node counts 
     initSearch(maxTimeMs);
+
+    fprintf(stderr, "Starting search with %dms allocated\n", maxTimeMs); // Debug
 
     // Iterative deepening: search depth 1, 2, 3, ... until time runs out
     for (int depth = 1; depth < MAX_SEARCH_DEPTH; depth++) {
@@ -144,16 +152,17 @@ Move getBestMove(Board *board, int maxTimeMs) {
             bestMove = iterationBestMove;
             bestScore = iterationBestScore;
 
-            // Optional: Print info for debugging (UCI "info" command)
-            printf("info depth %d score cp %d time %d\n",
-                   depth, (int)bestScore, getElapsedTime());
+            int elapsed =getElapsedTime()   ; 
+            fprintf(stderr, "Completed depth %d in %dms (score: %.0f)\n",
+                    depth, elapsed, bestScore); // Debug
         }
 
         // Stop if time is up or we found a mate
         if (searchInfo.timeUp || bestScore > MATE_SCORE - 100) {
+            fprintf(stderr, "Time up! Searched to depth %d\n", depth - 1); // Debug
             break;
         }
     }
-
+    fprintf(stderr, "Returning move after %dms\n", getElapsedTime()); // Debug
     return bestMove;
 }

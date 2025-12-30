@@ -11,6 +11,7 @@
 #include "searching.h"
 
 #include <time.h>
+#include <limits.h> 
 
 #define INPUT_BUFFER 4096
 
@@ -175,10 +176,10 @@ void parseGo(Board *board, char *line) {
                 timeToThink = maxTime;
             }
 
-            // Safety: Leave some time buffer (50ms)
-            timeToThink -= 50;
-            if (timeToThink < 100) {
-                timeToThink = 100; // Minimum 100ms
+            // Safety: Leave some time buffer, heroku is pretty slow 
+            timeToThink -= 200;
+            if (timeToThink < 50) {
+                timeToThink = 50; // Minimum 100ms
             }
         } else {
             timeToThink = 5000; // Default 5 seconds
