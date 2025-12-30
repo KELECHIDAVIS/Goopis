@@ -21,9 +21,107 @@ void getPseudoLegalMoves(const Board *board, Move *moveList, size_t *numMoves) {
     getKingMoves(board, moveList, numMoves);
 }
 
-// TODO: sort moves based on viability to improve alpha beta
+// move ordering
+// Add to moves.c
+static const int PIECE_VALUES[6] = {
+    100,  // nPawn
+    320,  // nKnight
+    330,  // nBishop
+    500,  // nRook
+    900,  // nQueen
+    20000 // nKing (high value to prioritize king captures in edge cases)
+};
 
-void sortMoveList(Move *moveList, size_t numMoves) {
+int scoreMoveForOrdering(const Board *board, Move move) {
+    unsigned int flags = getFlags(move);
+    unsigned int to = getTo(move);
+    unsigned int from = getFrom(move);
+
+    int score = 0;
+
+    // Promotions (highest priority)
+    if (flags >= KNIGHT_PROMOTION_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG) {
+        score = 9000000; // Base promotion score
+
+        // Add promotion piece value
+        if (flags == QUEEN_PROMOTION_FLAG || flags == QUEEN_PROMO_CAPTURE_FLAG)
+            score += 900;
+        else if (flags == ROOK_PROMOTION_FLAG || flags == ROOK_PROMO_CAPTURE_FLAG)
+            score += 500;
+        else if (flags == BISHOP_PROMOTION_FLAG || flags == BISHOP_PROMO_CAPTURE_FLAG)
+            score += 330;
+        else if (flags == KNIGHT_PROMOTION_FLAG || flags == KNIGHT_PROMO_CAPTURE_FLAG)
+            score += 320;
+
+        // If it's also a capture, add MVV-LVA
+        if (flags >= KNIGHT_PROMO_CAPTURE_FLAG && flags <= QUEEN_PROMO_CAPTURE_FLAG) {
+            enumPiece capturedPiece = board->mailbox[to];
+            if (isValidPiece(capturedPiece)) {
+                score += PIECE_VALUES[capturedPiece - 2] * 10;
+            }
+        }
+    }
+    // Captures (MVV-LVA)
+    else if (flags == CAPTURE_FLAG || flags == EN_PASSANT_CAPTURE_FLAG) {
+        enumPiece victim = board->mailbox[to];
+        enumPiece attacker = board->mailbox[from];
+
+        if (flags == EN_PASSANT_CAPTURE_FLAG) {
+            victim = nPawn; // En passant always captures a pawn
+        }
+
+        if (isValidPiece(victim) && isValidPiece(attacker)) {
+            // MVV-LVA: (VictimValue * 10) - AttackerValue
+            // This prioritizes capturing valuable pieces with less valuable pieces
+            score = PIECE_VALUES[victim - 2] * 10 - PIECE_VALUES[attacker - 2];
+            score += 1000000; // Ensure captures are searched before quiet moves
+        }
+    }
+    // Castling (relatively safe, good move)
+    else if (flags == KING_CASTLE_FLAG || flags == QUEEN_CASTLE_FLAG) {
+        score = 50000;
+    }
+    // Quiet moves (lowest priority)
+    else {
+        score = 0;
+    }
+
+    return score;
+}
+
+typedef struct {
+    Move move;  
+    int score ; 
+}ScoredMove; //for efficient move scoring  
+
+static int compareScoredMoves(const void* a , const void * b ){
+    const ScoredMove *moveA = (const ScoredMove *)a;
+    const ScoredMove *moveB = (const ScoredMove *)b;
+
+    // Sort in descending order (highest score first)
+    return moveB->score - moveA->score;
+}
+
+void sortMoveList(const Board* board, Move *moveList, size_t numMoves) {
+
+    if (numMoves <= 1)
+        return;
+
+    // Score all moves once
+    ScoredMove scoredMoves[numMoves];
+    for (size_t i = 0; i < numMoves; i++) {
+        scoredMoves[i].move = moveList[i];
+        scoredMoves[i].score = scoreMoveForOrdering(board, moveList[i]);
+    }
+
+    // sort precomputed scores
+    qsort(scoredMoves, numMoves, sizeof(ScoredMove), compareScoredMoves);
+
+    // replace moves in move list based on scored moves
+    for (size_t i = 0 ; i< numMoves; i++){
+        moveList[i] = scoredMoves[i].move; 
+    }
+
 }
 void getPawnMoves(const Board *board, Move *moveList, size_t *numMoves) {
     enumPiece side = board->whiteToMove ? nWhite : nBlack;
