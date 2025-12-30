@@ -115,78 +115,85 @@ void parsePosition(Board *board, char *line) {
 
 // --- Helper: Parse "go perft <depth>" ---
 void parseGo(Board *board, char *line) {
-    // "go perft 5" or just "go" (Arena might send just "go" for a game)
-    // For debugging, we can implement a custom perft trigger.
-
     if (strstr(line, "perft")) {
-        int depth = 3; // default
-        char *ptr = strstr(line, "perft");
-        if (ptr) {
-            depth = atoi(ptr + 6);
-        }
-
-        clock_t t;
-        t = clock();
-        U64 nodes = divide(board, depth);
-        t = clock() - t;
-        double seconds = ((double)t) / CLOCKS_PER_SEC;
-        U64 nodesPerSecond = (U64)((double)nodes / seconds);
-        printf("Nodes Per Second: %llu\n", nodesPerSecond);
-    } else // ex: go 4, return the best move searching a depth of 4
-    {
-
-        int depth = -1;
-        int wtime = -1, btime = -1;
-        int movetime = -1;
-
-        // 1. Check for "infinite"
-        if (strstr(line, "infinite")) {
-            depth = 6;
-        }
-
-        // 2. Parse "wtime", "btime", "movetime", "depth"
-        char *ptr = NULL;
-
-        if ((ptr = strstr(line, "wtime")))
-            wtime = atoi(ptr + 6);
-        if ((ptr = strstr(line, "btime")))
-            btime = atoi(ptr + 6);
-        if ((ptr = strstr(line, "movetime")))
-            movetime = atoi(ptr + 9);
-        if ((ptr = strstr(line, "depth")))
-            depth = atoi(ptr + 6);
-
-        // 3. Determine Search Mode
-        // Ideally implement time management here.
-        // Example: int timeToThink = (board->sideToMove == WHITE) ? wtime / 30 : btime / 30;
-
-        // For now, since your engine seems to rely on fixed depth:
-        if (depth == -1) {
-            // If Lichess didn't specify a depth (it usually provides time instead),
-
-            if (wtime > 0 && btime > 0) {
-
-                if (wtime > 60000 && btime > 60000)
-                    depth = 6;
-                else
-                    depth = 5;
-            } else {
-                depth = 5; // Fallback default
-            }
-        }
-
-        // 4. Execute Search
-        // If you add time management later, you would pass 'movetime' or 'wtime' to getBestMove
-        Move bestMove = getBestMove(board, depth);
-
-        printf("bestmove ");
-        if (bestMove) {
-            printMove(bestMove);
-        } else { 
-            printf("0000"); // no move can be made 
-        }
-        printf("\n");
+        // ... existing perft code ...
+        return;
     }
+
+    int depth = -1;
+    int wtime = -1, btime = -1;
+    int winc = 0, binc = 0;
+    int movetime = -1;
+    int movestogo = 40; // Default moves to go
+
+    char *ptr = NULL;
+
+    // Parse all time control parameters
+    if ((ptr = strstr(line, "wtime")))
+        wtime = atoi(ptr + 6);
+    if ((ptr = strstr(line, "btime")))
+        btime = atoi(ptr + 6);
+    if ((ptr = strstr(line, "winc")))
+        winc = atoi(ptr + 5);
+    if ((ptr = strstr(line, "binc")))
+        binc = atoi(ptr + 5);
+    if ((ptr = strstr(line, "movetime")))
+        movetime = atoi(ptr + 9);
+    if ((ptr = strstr(line, "movestogo")))
+        movestogo = atoi(ptr + 10);
+    if ((ptr = strstr(line, "depth")))
+        depth = atoi(ptr + 6);
+
+    int timeToThink = 0;
+
+    // Calculate time budget
+    if (movetime > 0) {
+        // Fixed time per move
+        timeToThink = movetime;
+    } else if (depth > 0) {
+        // Fixed depth search - give it plenty of time
+        timeToThink = 60000; // 1 minute max
+    } else if (strstr(line, "infinite")) {
+        // Infinite search
+        timeToThink = INT_MAX;
+        depth = MAX_SEARCH_DEPTH;
+    } else {
+        // Calculate based on time left
+        int myTime = board->whiteToMove ? wtime : btime;
+        int myInc = board->whiteToMove ? winc : binc;
+
+        if (myTime > 0) {
+            // Time management heuristic:
+            // Use: (timeLeft / movesToGo) + (increment * 0.75)
+            // But don't use more than 1/3 of remaining time
+
+            timeToThink = (myTime / movestogo) + (myInc * 3 / 4);
+
+            // Safety: Don't use more than 1/3 of remaining time
+            int maxTime = myTime / 3;
+            if (timeToThink > maxTime) {
+                timeToThink = maxTime;
+            }
+
+            // Safety: Leave some time buffer (50ms)
+            timeToThink -= 50;
+            if (timeToThink < 100) {
+                timeToThink = 100; // Minimum 100ms
+            }
+        } else {
+            timeToThink = 5000; // Default 5 seconds
+        }
+    }
+
+    Move bestMove = getBestMove(board, timeToThink);
+
+    printf("bestmove ");
+    if (bestMove) {
+        printMove(bestMove);
+    } else {
+        printf("0000");
+    }
+    printf("\n");
 }
 
 int main() {
