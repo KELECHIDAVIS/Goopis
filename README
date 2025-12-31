@@ -1,5 +1,9 @@
 Goopis is an optimized, bitboard-based chess engine that was written in C. 
+
 You can challenge and play against the bot here: https://lichess.org/@/Goopis
+
+Each version of the engine, as well as its rankings against one another, can be found in the engineVersions directory
+
 
 thanks to:
 chessprogramming.org
