@@ -36,15 +36,7 @@ static inline int magicIndex(SMagic *entry, U64 blockers)
 {
     return (int)((blockers * entry->magic) >> (entry->shiftAmt));
 }
-static inline U64 randU64()
-{
-    U64 u1, u2, u3, u4;
-    u1 = (U64)(rand()) & 0xFFFF;
-    u2 = (U64)(rand()) & 0xFFFF;
-    u3 = (U64)(rand()) & 0xFFFF;
-    u4 = (U64)(rand()) & 0xFFFF;
-    return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
-}
+
 // Attack pattern getters (inline for performance)
 static inline U64 getKnightAttackPattern(enumSquare square)
 {

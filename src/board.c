@@ -376,7 +376,63 @@ static void initMailbox(Board *board) {
         }
     }
 }
-// TODO: make sure that enpassant squares are printed correctly
+
+void initZobristRandoms() {
+    //piece randoms 
+    for (int side = nWhite; side <= nBlack ; side++){
+        for (enumPiece piece = nPawn; piece <= nKing; piece++){
+            for(enumSquare square = a1 ; square <=h8; square++){
+                PieceRandoms[side][piece][square] = randU64(); 
+            }
+        }
+    }
+
+    // castling 
+    for (int i =0 ; i< 16; i++){
+        CastlingRandoms[i] = randU64(); 
+    }
+
+    // side 
+    for (int side = nWhite ; side <= nBlack ; side++){
+        SideRandoms[side] = randU64(); 
+    }
+
+    // en passant 
+    for(int square= 0; square <= NO_SQUARE; square++){
+        EpRandoms[square] = randU64(); 
+    }
+}
+
+void initZobristKey(Board* board) {
+    board->zobristKey = 0; 
+
+    // iterate through all piece types for white and black 
+    // get the square that that piece is on 
+    // xor that specifc side,piece,square rand value with zobrist key 
+    for(int square = 0 ; square<64 ; square++ ){
+        
+        enumPiece piece = board->mailbox[square]; 
+        
+        if (!isValidPiece(piece)) continue ; 
+        
+        U64 pieceBit = 1ULL<< square ; 
+        enumPiece side = getColorPieces(board, nWhite) & pieceBit ? nWhite : nBlack;
+        
+        board->zobristKey ^= PieceRandoms[side][piece][square]; 
+        
+    }
+
+    // castling
+    board->zobristKey ^= CastlingRandoms[board->castlingRights]; 
+
+    // side to move 
+    int sideToMove = board->whiteToMove ? nWhite : nBlack; 
+    board->zobristKey ^= SideRandoms[sideToMove]; 
+
+    // enPassant
+    board->zobristKey ^= EpRandoms[board->enPassantSquare]; 
+}
+
 void initBoard(Board *board, char *fen) {
 
     char *curr = fen; // copy fen
@@ -409,6 +465,9 @@ void initBoard(Board *board, char *fen) {
 
     // init the history to 0
     board->historyPly = 0;
+
+    //init zobrist key 
+    initZobristKey(board);
 }
 
 void initStandardChess(Board *board) {

@@ -6,6 +6,10 @@ c// Pseudo-code
 if (positionRepeatedThreeTimes(board)) {
     return DRAW_SCORE;
 }
+
+
+1.5 : through zobrist hashing, add transposition tables to memoize calculated board positions we've already seen when searching moves
+
 2. Insufficient Material
 Detect positions where neither side can mate (e.g., K vs K, K+B vs K):
 cif (hasInsufficientMaterial(board)) {
@@ -15,3 +19,4 @@ cif (hasInsufficientMaterial(board)) {
 When you get a mate score from a child node, you might want to verify it's actually a mate:
 c// Check if score is a mate score
 #define IS_MATE_SCORE(score) (abs(score) > MATE_SCORE - 1000)
+

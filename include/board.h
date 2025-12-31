@@ -140,7 +140,29 @@ typedef struct
     unsigned short fullmoveNumber; // starts at 1 and increments after
     MoveHistory historyArr[MAX_SEARCH_DEPTH];
     int historyPly;
+    U64 zobristKey; 
 } Board;
+
+// zobrist randoms 
+
+extern U64 PieceRandoms[2][6][64]; // sides , piece types , num squares 
+extern U64 CastlingRandoms[16];  // castling rights range from 0000 -> 1111
+extern U64 SideRandoms[2]; 
+extern U64 EpRandoms[65]; // can be any square or NO_SQUARE
+
+
+extern void initZobristRandoms(); // fills arrays up with random vals 
+
+extern void initZobristKey(Board* board); // initializes key for
+
+static inline U64 randU64() {
+    U64 u1, u2, u3, u4;
+    u1 = (U64)(rand()) & 0xFFFF;
+    u2 = (U64)(rand()) & 0xFFFF;
+    u3 = (U64)(rand()) & 0xFFFF;
+    u4 = (U64)(rand()) & 0xFFFF;
+    return u1 | (u2 << 16) | (u3 << 32) | (u4 << 48);
+}
 
 static inline U64 getAllPieces(const Board *board) {
     return board->pieces[nWhite] | board->pieces[nBlack];
@@ -180,5 +202,6 @@ extern void printBB(U64 bb);
 extern void printChessBoard(const Board *board);
 extern void printBoardDetails(Board *board);
 extern void translateSquareToAlgebraic(enumSquare square, char *buffer);
+
 
 #endif // BOARD_H

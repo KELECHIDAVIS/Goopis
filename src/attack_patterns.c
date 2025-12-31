@@ -694,7 +694,6 @@ void writeAllAttackPatternsToFile(void)
 
 void precomputeSlidingPieceLookupTables()
 {
-    printf("Initializing magic bitboard lookup tables...\n");
 
     // For both bishops and rooks
     for (int isBishop = 0; isBishop <= 1; isBishop++)
@@ -722,7 +721,6 @@ void precomputeSlidingPieceLookupTables()
         }
     }
 
-    printf("Magic bitboard initialization complete!\n");
 }
 
 // test lookup generation
