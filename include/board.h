@@ -145,10 +145,10 @@ typedef struct
 
 // zobrist randoms 
 
-extern U64 PieceRandoms[2][6][64]; // sides , piece types , num squares 
-extern U64 CastlingRandoms[16];  // castling rights range from 0000 -> 1111
-extern U64 SideRandoms[2]; 
-extern U64 EpRandoms[65]; // can be any square or NO_SQUARE
+static U64 PieceRandoms[2][6][64]; // sides , piece types , num squares 
+static U64 CastlingRandoms[16];  // castling rights range from 0000 -> 1111
+static U64 SideRandoms[2]; 
+static U64 EpRandoms[65]; // can be any square or NO_SQUARE
 
 
 extern void initZobristRandoms(); // fills arrays up with random vals 
