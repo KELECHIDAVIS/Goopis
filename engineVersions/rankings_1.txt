@@ -1,0 +1,37 @@
+Rank Name                          Elo     +/-   Games   Score    Draw 
+   1 Goopis_TransTable             382     252      20   90.0%   20.0% 
+   2 Goopis_IterativeDeepening     147     128      20   70.0%   40.0% 
+   3 Goopis_MoveOrdering           -53     118      20   42.5%   45.0% 
+   4 Goopis_Pesto                  -89     105      20   37.5%   55.0% 
+   5 Goopis_Standard              -382     252      20   10.0%   20.0% 
+
+SPRT: llr 0 (0.0%), lbound -inf, ubound inf
+50 of 50 games finished.
+
+Player: Goopis_TransTable
+   "Draw by 3-fold repetition": 4
+   "Win: Black mates": 4
+   "Win: White makes an illegal move: 0000": 2
+   "Win: White mates": 10
+Player: Goopis_IterativeDeepening
+   "Draw by 3-fold repetition": 8
+   "Loss: White mates": 2
+   "Win: Black mates": 7
+   "Win: White mates": 3
+Player: Goopis_MoveOrdering
+   "Draw by 3-fold repetition": 9
+   "Loss: Black mates": 3
+   "Loss: White makes an illegal move: 0000": 1
+   "Loss: White mates": 3
+   "Win: Black mates": 3
+   "Win: White mates": 1
+Player: Goopis_Pesto
+   "Draw by 3-fold repetition": 11
+   "Loss: Black mates": 4
+   "Loss: White makes an illegal move: 0000": 1
+   "Loss: White mates": 2
+   "Win: Black mates": 2
+Player: Goopis_Standard 
+   "Draw by 3-fold repetition": 4
+   "Loss: Black mates": 9
+   "Loss: White mates": 7

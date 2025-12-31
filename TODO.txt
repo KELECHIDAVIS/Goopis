@@ -17,8 +17,5 @@ Detect positions where neither side can mate (e.g., K vs K, K+B vs K):
 cif (hasInsufficientMaterial(board)) {
     return DRAW_SCORE;
 }
-3. Better Mate Distance Handling
-When you get a mate score from a child node, you might want to verify it's actually a mate:
-c// Check if score is a mate score
-#define IS_MATE_SCORE(score) (abs(score) > MATE_SCORE - 1000)
+
 
