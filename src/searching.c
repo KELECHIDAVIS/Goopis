@@ -179,6 +179,11 @@ static uint64_t nodeCount = 0;
 
 // https://www.chessprogramming.org/Quiescence_Search
 int quiessence (Board *board, int alpha, int beta) {
+    
+    if (shouldStop())
+        return 0;
+    nodeCount++;
+
     int static_eval = evaluate(board);
 
     // Stand Pat
@@ -244,21 +249,17 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
     if (shouldStop())
         return 0;
 
-    // Max depth safety check (matches your board.h define)
+    // Max depth safety check
     if (board->historyPly >= MAX_SEARCH_DEPTH - 1) {
         return quiessence(board, alpha, beta);
     }
 
-    // 50-move rule
-    if (board->halfmoveClock >= 100) {
+    // 50-move rule and if the board state is repeated a draw can be forced 
+    if (board->halfmoveClock >= 100 || isRepetition(board)) {
         return DRAW_SCORE;
     }
 
-    // if the state was repeated before, through perfect play the opp can draw out a 3-fold-repetition
-    if (isRepetition(board)) {
-        return DRAW_SCORE;
-    }
-
+    
     // 1. Probe Transposition Table
     int ttScore;
     Move ttMove = 0;
@@ -275,15 +276,14 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
     size_t numMoves = 0;
     getPseudoLegalMoves(board, move_list, &numMoves);
 
-    // 3. Score Moves (Your existing logic)
+    // 3. Score Moves 
     // We prioritize the move from the TT if it exists
     sortMoveList(board, move_list, numMoves);
 
-    // Explicitly move TT best-move to front if sortMoveList didn't handle it
+    // move tt move to front of list 
     if (ttMove != 0) {
         for (size_t i = 0; i < numMoves; i++) {
-            if (move_list[i] == ttMove) {
-                // Simple swap to index 0
+            if (move_list[i] == ttMove) { // swap 
                 Move temp = move_list[0];
                 move_list[0] = ttMove;
                 move_list[i] = temp;
@@ -322,7 +322,7 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
                 bestMove = move_list[i];
             }
         } else {
-            unmakeMove(board, move_list[i]);
+            unmakeMove(board, move_list[i]); //unmake illegal move 
         }
     }
 
@@ -348,13 +348,33 @@ int alphaBeta(Board *board, int depth, int alpha, int beta) {
 }
 
 Move getBestMove(Board *board, int maxTimeMs) {
-    Move bestMove = 0;
+    Move safeMove = 0; // The fallback move
+    Move bestMoveThisIter = 0;
     int bestScore = -MATE_SCORE;
 
     nodeCount = 0;
     initSearch(maxTimeMs);
 
-    // clearTransTable(); // Optional: Clear if you want fresh search every move
+    // 1. GENERATE A SAFETY FALLBACK MOVE
+    // If the search fails completely (0 depth or timeout immediately),
+    // we MUST return a legal move to avoid "0000".
+    Move moveList[MAX_MOVES];
+    size_t numMoves = 0;
+    getPseudoLegalMoves(board, moveList, &numMoves);
+    enumPiece currSide = board->whiteToMove ? nWhite : nBlack;
+
+    for (size_t i = 0; i < numMoves; i++) {
+        makeMove(board, moveList[i]);
+        if (!isSideInCheck(board, currSide)) {
+            safeMove = moveList[i]; // Found a legal move!
+            unmakeMove(board, moveList[i]);
+            break;
+        }
+        unmakeMove(board, moveList[i]);
+    }
+
+    // If safeMove is still 0, we are likely Mated or Stalemate.
+    
 
     fprintf(stderr, "Search Start: %dms limit\n", maxTimeMs);
 
@@ -363,25 +383,23 @@ Move getBestMove(Board *board, int maxTimeMs) {
 
         int score = alphaBeta(board, depth, -MATE_SCORE, MATE_SCORE);
 
+        // If time ran out during alphaBeta, the score and TT entry are unreliable.
+        // We break immediately and use the result from the PREVIOUS successful depth.
         if (searchInfo.timeUp) {
             fprintf(stderr, "Time Up at Depth %d\n", depth);
             break;
         }
 
-        // Try to get the Best Move from TT for this depth
-        // This is safer than relying on variables inside the loop
+        // Search finished for this depth. Try to retrieve the best move from TT.
         TTEntry *entry = &transTable[board->zobristKey % ttEntryCount];
-        if (entry->zobristKey == board->zobristKey && entry->bestMove != 0) {
 
-            // validating that the move retrieved was a legal one
-            Move moveList[MAX_MOVES];
-            size_t numMoves = 0;
-            getPseudoLegalMoves(board, moveList, &numMoves);
-            enumPiece currSide = board->whiteToMove ? nWhite : nBlack;
+        // STRICT MOVE VERIFICATION
+        // Even if TT says it's best, we verify it is legal in the current position.
+        // This prevents "illegal move" bugs caused by hash collisions.
+        if (entry->zobristKey == board->zobristKey && entry->bestMove != 0) {
             bool isLegal = false;
             for (size_t i = 0; i < numMoves; i++) {
                 if (moveList[i] == entry->bestMove) {
-                    // Check if move is actually legal (not leaving king in check)
                     makeMove(board, moveList[i]);
                     if (!isSideInCheck(board, currSide)) {
                         isLegal = true;
@@ -392,8 +410,10 @@ Move getBestMove(Board *board, int maxTimeMs) {
             }
 
             if (isLegal) {
-                bestMove = entry->bestMove;
+                bestMoveThisIter = entry->bestMove;
                 bestScore = score;
+                // Update our fallback: this is now the safest, best move we have.
+                safeMove = bestMoveThisIter;
             }
         }
 
@@ -401,10 +421,9 @@ Move getBestMove(Board *board, int maxTimeMs) {
         fprintf(stderr, "Depth %d: Score %d, Nodes %llu, Time %dms\n",
                 depth, score, (unsigned long long)nodeCount, elapsed);
 
-        // Stop early if forced mate found
         if (score > MATE_BOUND || score < -MATE_BOUND)
             break;
     }
 
-    return bestMove;
+    return safeMove;
 }
