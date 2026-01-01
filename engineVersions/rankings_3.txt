@@ -1,0 +1,161 @@
+Rank Name                          Elo     +/-   Games   Score    Draw 
+   1 GoopisRepetition              166     119      27   72.2%   33.3% 
+   2 Goopis_Final                  116     123      31   66.1%   16.1% 
+   3 Goopis_RepValidation           83     116      30   61.7%   23.3% 
+   4 Goopis_TransTable              76      93      28   60.7%   50.0% 
+   5 Stockfish_1320                 23     120      30   53.3%   13.3% 
+   6 Goopis_IterativeDeepening      22      84      31   53.2%   54.8% 
+   7 Goopis_MoveOrdering           -22     103      32   46.9%   31.3% 
+   8 Goopis_Pesto                 -198     109      31   24.2%   35.5% 
+   9 Goopis_Standard              -301     198      30   15.0%   10.0% 
+
+SPRT: llr 0 (0.0%), lbound -inf, ubound inf
+141 of 360 games finished.
+
+Player: Goopis_Final
+   " makes an illegal move: 0000": 2
+   " makes an illegal move: h8g6": 1
+   "Draw by 3-fold repetition": 2
+   "Loss: Black makes an illegal move: 0000": 3
+   "Loss: Black makes an illegal move: b1d2": 1
+   "Loss: Black makes an illegal move: c1d3": 1
+   "Loss: Black makes an illegal move: h1f2": 1
+   "Loss: White makes an illegal move: a8b6": 1
+   "Loss: White makes an illegal move: b8d7": 1
+   "No result": 1
+   "Win: Black loses on time": 1
+   "Win: Black makes an illegal move: a1c2": 1
+   "Win: Black makes an illegal move: a7a8": 1
+   "Win: Black makes an illegal move: d5c5": 1
+   "Win: Black makes an illegal move: d7d6": 1
+   "Win: Black mates": 7
+   "Win: White makes an illegal move: g2g3": 1
+   "Win: White mates": 5
+Player: Goopis_IterativeDeepening
+   " makes an illegal move: 0000": 1
+   "Draw by 3-fold repetition": 16
+   "Loss: Black makes an illegal move: c4a6": 1
+   "Loss: Black mates": 3
+   "Loss: White makes an illegal move: c7d6": 1
+   "Loss: White mates": 1
+   "No result": 1
+   "Win: Black makes an illegal move: b8a6": 1
+   "Win: Black makes an illegal move: d6e7": 1
+   "Win: Black mates": 3
+   "Win: White mates": 3
+Player: Goopis_MoveOrdering
+   " makes an illegal move: 0000": 1
+   " makes an illegal move: a1c2": 1
+   "Draw by 3-fold repetition": 8
+   "Loss: Black makes an illegal move: c7c6": 1
+   "Loss: Black makes an illegal move: g7f8": 1
+   "Loss: Black mates": 3
+   "Loss: White makes an illegal move: a8c7": 1
+   "Loss: White makes an illegal move: e5f7": 1
+   "Loss: White makes an illegal move: g2g3": 1
+   "Loss: White makes an illegal move: h5g6": 1
+   "Loss: White mates": 3
+   "Win: Black loses on time": 2
+   "Win: Black makes an illegal move: 0000": 1
+   "Win: Black mates": 3
+   "Win: White makes an illegal move: c8a7": 1
+   "Win: White makes an illegal move: g3g4": 1
+   "Win: White mates": 2
+Player: Goopis_Pesto
+   " makes an illegal move: a1c2": 1
+   "Draw by 3-fold repetition": 10
+   "Loss: Black loses on time": 5
+   "Loss: Black mates": 3
+   "Loss: Black's connection stalls": 1
+   "Loss: White loses on time": 3
+   "Loss: White makes an illegal move: f1g1": 1
+   "Loss: White makes an illegal move: h6g5": 1
+   "Loss: White mates": 4
+   "No result": 1
+   "Win: Black makes an illegal move: 0000": 1
+   "Win: Black mates": 1
+Player: Goopis_RepValidation
+   " makes an illegal move: 0000": 1
+   " makes an illegal move: a1b3": 1
+   " makes an illegal move: h1g3": 1
+   " makes an illegal move: h8f7": 1
+   "Draw by 3-fold repetition": 3
+   "Loss: Black makes an illegal move: 0000": 2
+   "Loss: Black makes an illegal move: a1c2": 1
+   "Loss: Black makes an illegal move: a7a8": 1
+   "Loss: Black makes an illegal move: d1e3": 1
+   "Loss: Black makes an illegal move: g3g2": 1
+   "Loss: Black mates": 1
+   "Loss: White makes an illegal move: b8d7": 1
+   "No result": 1
+   "Win: Black loses on time": 1
+   "Win: Black makes an illegal move: 0000": 1
+   "Win: Black makes an illegal move: g7f8": 1
+   "Win: Black makes an illegal move: h1f2": 1
+   "Win: Black mates": 4
+   "Win: White loses on time": 1
+   "Win: White makes an illegal move: g8f6": 1
+   "Win: White mates": 5
+Player: Goopis_Standard 
+   "Draw by 3-fold repetition": 3
+   "Loss: Black makes an illegal move: b8a6": 1
+   "Loss: Black makes an illegal move: d7d6": 1
+   "Loss: Black mates": 11
+   "Loss: White makes an illegal move: g3g4": 1
+   "Loss: White mates": 10
+   "Win: Black makes an illegal move: 0000": 2
+   "Win: White makes an illegal move: a8c7": 1
+Player: Goopis_TransTable
+   " makes an illegal move: 0000": 1
+   " makes an illegal move: a1b3": 1
+   " makes an illegal move: b1c3": 1
+   " makes an illegal move: f1d2": 1
+   " makes an illegal move: h8f7": 1
+   " makes an illegal move: h8g6": 1
+   "Draw by 3-fold repetition": 8
+   "Loss: Black makes an illegal move: b1c3": 1
+   "Loss: Black makes an illegal move: d6e7": 1
+   "Loss: White makes an illegal move: 0000": 1
+   "Loss: White makes an illegal move: g8f6": 1
+   "No result": 2
+   "Win: Black loses on time": 1
+   "Win: Black makes an illegal move: c1d3": 1
+   "Win: Black mates": 1
+   "Win: White loses on time": 1
+   "Win: White makes an illegal move: a8b6": 1
+   "Win: White makes an illegal move: b8d7": 1
+   "Win: White makes an illegal move: e5f7": 1
+   "Win: White makes an illegal move: h6g5": 1
+   "Win: White mates": 2
+Player: GoopisRepetition
+   " makes an illegal move: f1d2": 1
+   " makes an illegal move: h1g3": 1
+   "Draw by 3-fold repetition": 7
+   "Loss: Black makes an illegal move: d5c5": 1
+   "Loss: Black mates": 1
+   "Loss: White makes an illegal move: c8a7": 1
+   "No result": 4
+   "Win: Black makes an illegal move: b1d2": 1
+   "Win: Black makes an illegal move: g3g2": 1
+   "Win: Black mates": 5
+   "Win: White loses on time": 1
+   "Win: White makes an illegal move: b8d7": 1
+   "Win: White makes an illegal move: h5g6": 1
+   "Win: White mates": 5
+Player: Stockfish_1320
+   " makes an illegal move: 0000": 2
+   " makes an illegal move: b1c3": 1
+   "Draw by 3-fold repetition": 1
+   "Loss: Black mates": 6
+   "Loss: White mates": 6
+   "No result": 2
+   "Win: Black makes an illegal move: b1c3": 1
+   "Win: Black makes an illegal move: c4a6": 1
+   "Win: Black makes an illegal move: c7c6": 1
+   "Win: Black makes an illegal move: d1e3": 1
+   "Win: Black mates": 4
+   "Win: Black's connection stalls": 1
+   "Win: White makes an illegal move: 0000": 1
+   "Win: White makes an illegal move: c7d6": 1
+   "Win: White makes an illegal move: f1g1": 1
+   "Win: White mates": 2
