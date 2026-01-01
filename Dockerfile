@@ -1,7 +1,7 @@
-# 1. Use Python as the base image
+# 1. Use Python 3.10-slim as the base image
 FROM python:3.10-slim
 
-# 2. Install build tools: GCC, CMake, and Make
+# 2. Install build dependencies for the engine
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
@@ -9,21 +9,24 @@ RUN apt-get update && apt-get install -y \
     make \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Set the working directory
+# 3. Set the initial working directory
 WORKDIR /app
 
-# 4. Copy all project files
+# 4. Copy everything from your local project into the container
 COPY . .
 
-# 5. Build the C engine using your CMakeLists.txt
+# 5. Move config.yml into the subdirectory where the bot script lives
+# This ensures config.yml is found and its relative paths (../) are correct
+RUN cp config.yml lichess-bot-master/config.yml
+
+# 6. Build your engine
 RUN mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release && \
     make
 
-
-# 6. Install Python dependencies
+# 7. Install Python requirements for the bot
 RUN pip install --no-cache-dir -r lichess-bot-master/requirements.txt
 
-# 7. Start the bot (The Fix)
-# We use /bin/sh to ensure we enter the directory before the python process starts
-CMD cd /app/lichess-bot-master && python -u lichess-bot.py --config ../config.yml
+# 8. Start the bot from inside its master folder
+WORKDIR /app/lichess-bot-master
+CMD ["python", "lichess-bot.py"]
